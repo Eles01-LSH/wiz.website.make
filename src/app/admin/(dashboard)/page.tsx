@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { getRegistrationStats } from "@/lib/registrations";
+import RegistrationQrCode from "@/components/admin/RegistrationQrCode";
 
 export const dynamic = "force-dynamic";
 
@@ -65,6 +66,8 @@ export default async function AdminDashboardPage() {
           <span className="mt-0.5 block text-[10px] font-normal">준비 중</span>
         </button>
       </div>
+
+      <RegistrationQrCode />
     </div>
   );
 }

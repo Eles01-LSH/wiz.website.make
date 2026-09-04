@@ -6,6 +6,8 @@ import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NAME_REGEX = /^[가-힣a-zA-Z\s]{2,20}$/;
+const PHONE_REGEX = /^01[016789]\d{7,8}$/;
 
 const CATEGORY_OPTIONS = [
   { value: "medical", label: "의료기관" },
@@ -25,7 +27,10 @@ export default function RegisterPage() {
     const consent = formData.get("consent") === "on";
 
     if (!name) return "이름을 입력해 주세요.";
+    if (!NAME_REGEX.test(name)) return "이름은 한글 또는 영문 2자 이상으로 입력해 주세요.";
     if (!phone) return "연락처를 입력해 주세요.";
+    if (!PHONE_REGEX.test(phone))
+      return "연락처는 하이픈(-) 없이 숫자만 입력해 주세요. (예: 01012345678)";
     if (email && !EMAIL_REGEX.test(email)) return "이메일 형식이 올바르지 않습니다.";
     if (!consent) return "개인정보 수집 및 이용에 동의해 주세요.";
     return null;
@@ -158,12 +163,14 @@ export default function RegisterPage() {
                 <div>
                   <label htmlFor="phone" className="mb-1.5 block text-xs font-semibold text-muted">
                     연락처 <span className="text-accent">*</span>
+                    <span className="ml-1.5 font-normal text-muted/70">(하이픈 없이 숫자만 입력)</span>
                   </label>
                   <input
                     id="phone"
                     type="tel"
+                    inputMode="numeric"
                     name="phone"
-                    placeholder="010-0000-0000"
+                    placeholder="01000000000"
                     className="w-full rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
                   />
                 </div>

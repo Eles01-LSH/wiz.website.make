@@ -3,6 +3,8 @@ import { addRegistration, type ParticipantCategory } from "@/lib/registrations";
 import { notifyRegistrationCreated } from "@/lib/notifications";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+const NAME_REGEX = /^[가-힣a-zA-Z\s]{2,20}$/;
+const PHONE_REGEX = /^01[016789]\d{7,8}$/;
 const CATEGORY_VALUES: ParticipantCategory[] = ["medical", "public", "etc"];
 
 type RegisterBody = {
@@ -52,9 +54,23 @@ export async function POST(request: Request) {
     );
   }
 
+  if (!NAME_REGEX.test(name)) {
+    return NextResponse.json(
+      { error: "이름은 한글 또는 영문 2자 이상으로 입력해 주세요." },
+      { status: 400 }
+    );
+  }
+
   if (!phone) {
     return NextResponse.json(
       { error: "연락처를 입력해 주세요." },
+      { status: 400 }
+    );
+  }
+
+  if (!PHONE_REGEX.test(phone)) {
+    return NextResponse.json(
+      { error: "연락처는 하이픈(-) 없이 숫자만 입력해 주세요. (예: 01012345678)" },
       { status: 400 }
     );
   }
