@@ -1,6 +1,6 @@
 export const CONTACT_INFO = [
   { label: "TEL", value: "062-383-2838" },
-  { label: "EMAIL", value: "wizmedia@naver.com" },
+  { label: "EMAIL", value: "wizcni2004@naver.com" },
   { label: "ADDRESS", value: "전남광주통합특별시 서구 화개중앙로 2, 3층 (금호동)" },
   { label: "HOURS", value: "평일 09:00 - 18:00" },
 ];
