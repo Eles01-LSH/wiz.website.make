@@ -4,11 +4,28 @@ import { NextResponse, type NextRequest } from "next/server";
 const PUBLIC_ADMIN_PATHS = ["/admin/login"];
 
 export async function updateSession(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const isPublicAdminPath = PUBLIC_ADMIN_PATHS.some(
+    (path) => pathname === path || pathname.startsWith(`${path}/`)
+  );
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  // Supabase 연동 전(env 미설정) 상태에서도 절대 열린 상태로 새지 않도록,
+  // 로그인 페이지를 제외한 /admin/* 는 세션 확인 없이도 fail-closed로 로그인 페이지로 보낸다.
+  if (!supabaseUrl || !supabaseAnonKey) {
+    if (pathname.startsWith("/admin") && !isPublicAdminPath) {
+      return NextResponse.redirect(new URL("/admin/login", request.url));
+    }
+    return NextResponse.next();
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    supabaseUrl,
+    supabaseAnonKey,
     {
       cookies: {
         getAll() {
@@ -30,11 +47,6 @@ export async function updateSession(request: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-
-  const { pathname } = request.nextUrl;
-  const isPublicAdminPath = PUBLIC_ADMIN_PATHS.some(
-    (path) => pathname === path || pathname.startsWith(`${path}/`)
-  );
 
   if (pathname.startsWith("/admin") && !isPublicAdminPath && !user) {
     const loginUrl = new URL("/admin/login", request.url);

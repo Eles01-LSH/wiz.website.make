@@ -73,18 +73,26 @@ export async function POST(request: Request) {
     );
   }
 
-  const registration = await addRegistration({
-    name,
-    organization,
-    department,
-    position,
-    phone,
-    email,
-    category,
-    meal,
-  });
+  try {
+    const registration = await addRegistration({
+      name,
+      organization,
+      department,
+      position,
+      phone,
+      email,
+      category,
+      meal,
+    });
 
-  await notifyRegistrationCreated(registration);
+    await notifyRegistrationCreated(registration);
 
-  return NextResponse.json({ ok: true }, { status: 201 });
+    return NextResponse.json({ ok: true }, { status: 201 });
+  } catch (err) {
+    console.error("register failed:", err);
+    return NextResponse.json(
+      { error: "등록 처리 중 오류가 발생했습니다. 잠시 후 다시 시도해 주세요." },
+      { status: 500 }
+    );
+  }
 }

@@ -16,17 +16,22 @@ export default function AdminLoginPage() {
     setErrorMessage(null);
     setSubmitting(true);
 
-    const supabase = createClient();
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
+    try {
+      const supabase = createClient();
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
 
-    if (error) {
-      setErrorMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
+      if (error) {
+        setErrorMessage("이메일 또는 비밀번호가 올바르지 않습니다.");
+        setSubmitting(false);
+        return;
+      }
+
+      router.push("/admin");
+      router.refresh();
+    } catch {
+      setErrorMessage("로그인 서버에 연결할 수 없습니다. 잠시 후 다시 시도해 주세요.");
       setSubmitting(false);
-      return;
     }
-
-    router.push("/admin");
-    router.refresh();
   }
 
   return (

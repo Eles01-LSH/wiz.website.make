@@ -1,4 +1,5 @@
 import "server-only";
+import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 
 export type ParticipantCategory = "medical" | "public" | "etc";
@@ -112,27 +113,47 @@ export async function getRegistrationStats() {
   };
 }
 
-/** 공개 사전등록 폼에서 호출. RLS가 checkin=false / sms_status='pending'을 강제한다. */
+/**
+ * 공개 사전등록 폼에서 호출. RLS가 checkin=false / sms_status='pending'을 강제한다.
+ * 익명 제출자는 SELECT 권한이 없어(관리자만 명단 조회 가능) INSERT 후 RETURNING으로
+ * 방금 넣은 행을 되읽을 수 없다 — 그래서 select()를 붙이지 않고, id는 미리 직접 생성해
+ * 넣은 뒤 입력값 그대로 조합해 반환한다. (RLS를 느슨하게 풀지 않기 위한 의도적인 설계.)
+ */
 export async function addRegistration(input: RegistrationInput): Promise<Registration> {
   const supabase = await createClient();
 
-  const { data, error } = await supabase
-    .from("registrations")
-    .insert({
-      name: input.name.trim(),
-      organization: input.organization?.trim() ?? "",
-      department: input.department?.trim() ?? "",
-      position: input.position?.trim() ?? "",
-      phone: input.phone.trim(),
-      email: input.email?.trim() ?? "",
-      category: input.category ?? "etc",
-      meal: input.meal ?? false,
-    })
-    .select(SELECT_COLUMNS)
-    .single();
+  const id = randomUUID();
+  const row = {
+    id,
+    name: input.name.trim(),
+    organization: input.organization?.trim() ?? "",
+    department: input.department?.trim() ?? "",
+    position: input.position?.trim() ?? "",
+    phone: input.phone.trim(),
+    email: input.email?.trim() ?? "",
+    category: input.category ?? "etc",
+    meal: input.meal ?? false,
+  };
 
+  const { error } = await supabase.from("registrations").insert(row);
   if (error) throw new Error(error.message);
-  return toRegistration(data as RegistrationRow);
+
+  return {
+    id,
+    name: row.name,
+    organization: row.organization,
+    department: row.department,
+    position: row.position,
+    phone: row.phone,
+    email: row.email,
+    category: row.category,
+    meal: row.meal,
+    checkin: false,
+    smsStatus: "pending",
+    smsSentAt: null,
+    smsError: null,
+    createdAt: new Date().toISOString(),
+  };
 }
 
 export async function setCheckin(id: string, checkin: boolean): Promise<Registration | null> {

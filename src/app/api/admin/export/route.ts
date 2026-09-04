@@ -1,4 +1,5 @@
 import * as XLSX from "xlsx";
+import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/supabase/auth";
 import { getRegistrations } from "@/lib/registrations";
 import {
@@ -35,7 +36,15 @@ export async function GET(request: Request) {
     sms: (url.searchParams.get("sms") as SmsFilter | null) ?? DEFAULT_FILTERS.sms,
   };
 
-  const registrations = filterRegistrations(await getRegistrations(), filters);
+  let registrations;
+  try {
+    registrations = filterRegistrations(await getRegistrations(), filters);
+  } catch {
+    return NextResponse.json(
+      { error: "명단을 불러오는 중 오류가 발생했습니다." },
+      { status: 500 }
+    );
+  }
 
   const rows = registrations.map((r, i) => ({
     No: i + 1,

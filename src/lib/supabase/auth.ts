@@ -29,6 +29,15 @@ export async function getAdminSession() {
  * 향후 역할별 API를 늘릴 때 requireAdmin(["message_manager", "super_admin"]) 형태로 사용한다.
  */
 export async function requireAdmin(allowedRoles?: AdminRole[]) {
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY) {
+    return {
+      response: NextResponse.json(
+        { error: "관리자 인증이 아직 설정되지 않았습니다. (Supabase 미연결)" },
+        { status: 401 }
+      ),
+    } as const;
+  }
+
   const { user, role, supabase } = await getAdminSession();
 
   if (!user) {

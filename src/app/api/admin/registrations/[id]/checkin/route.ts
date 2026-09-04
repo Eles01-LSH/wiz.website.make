@@ -28,14 +28,21 @@ export async function PATCH(
     );
   }
 
-  const registration = await setCheckin(id, body.checkin);
+  try {
+    const registration = await setCheckin(id, body.checkin);
 
-  if (!registration) {
+    if (!registration) {
+      return NextResponse.json(
+        { error: "등록 정보를 찾을 수 없습니다." },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json({ ok: true, registration });
+  } catch {
     return NextResponse.json(
-      { error: "등록 정보를 찾을 수 없습니다." },
-      { status: 404 }
+      { error: "체크인 처리 중 오류가 발생했습니다." },
+      { status: 500 }
     );
   }
-
-  return NextResponse.json({ ok: true, registration });
 }
