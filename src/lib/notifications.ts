@@ -1,14 +1,32 @@
+import "server-only";
+import { SolapiMessageService } from "solapi";
 import type { Registration } from "@/lib/registrations";
+import { updateSmsStatus } from "@/lib/registrations";
+
+const API_KEY = process.env.SOLAPI_API_KEY;
+const API_SECRET = process.env.SOLAPI_API_SECRET;
+const SENDER_NUMBER = process.env.SOLAPI_SENDER_NUMBER;
 
 /**
- * 사전등록 완료 후 알림 발송 지점.
- * 향후 SOLAPI 연동 시 이 함수 내부에서 서버 전용 환경변수(NEXT_PUBLIC_ 접두사 없음)로
- * 발급받은 SOLAPI API 키를 사용해 문자를 발송하고, registrations.sms_status를
- * 'sent' | 'failed'로 업데이트한다 (관리자 화면의 /admin/messages, 통계 카드와 연동).
- * 프론트엔드에는 절대 키를 노출하지 않는다. 지금 단계에서는 아무 동작도 하지 않는다.
+ * 사전등록 완료 직후 확인 문자를 발송하고, 발송 결과를
+ * registrations.sms_status / sms_sent_at / sms_error에 기록한다.
+ * SOLAPI 환경변수가 없으면(미설정) 조용히 건너뛴다 — 등록 자체는 이미 성공한 상태이므로
+ * 문자 발송 실패/미설정이 사전등록 성공 응답을 막아서는 안 된다.
  */
-export async function notifyRegistrationCreated(
-  registration: Registration
-): Promise<void> {
-  void registration;
+export async function notifyRegistrationCreated(registration: Registration): Promise<void> {
+  if (!API_KEY || !API_SECRET || !SENDER_NUMBER) return;
+
+  try {
+    const messageService = new SolapiMessageService(API_KEY, API_SECRET);
+    await messageService.send({
+      to: registration.phone,
+      from: SENDER_NUMBER,
+      text: `[WIZ CNI] ${registration.name}님, 사전등록이 완료되었습니다. 행사 관련 안내를 순차적으로 보내드리겠습니다.`,
+    });
+    await updateSmsStatus(registration.id, "sent");
+  } catch (err) {
+    const message = err instanceof Error ? err.message : "알 수 없는 오류";
+    console.error("SOLAPI 문자 발송 실패:", err);
+    await updateSmsStatus(registration.id, "failed", message);
+  }
 }

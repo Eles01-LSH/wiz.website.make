@@ -1,6 +1,7 @@
 import "server-only";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export type ParticipantCategory = "medical" | "public" | "etc";
 export type SmsStatus = "pending" | "sent" | "failed";
@@ -154,6 +155,26 @@ export async function addRegistration(input: RegistrationInput): Promise<Registr
     smsError: null,
     createdAt: new Date().toISOString(),
   };
+}
+
+/**
+ * 사전등록 확인 문자 발송 결과를 기록한다. 익명 등록 직후(관리자 세션이 없는
+ * 상태) 서버에서 자동으로 호출되므로, RLS를 우회하는 service-role 클라이언트를 쓴다.
+ */
+export async function updateSmsStatus(
+  id: string,
+  status: SmsStatus,
+  errorMessage?: string
+): Promise<void> {
+  const supabase = createAdminClient();
+  await supabase
+    .from("registrations")
+    .update({
+      sms_status: status,
+      sms_sent_at: status === "sent" ? new Date().toISOString() : null,
+      sms_error: status === "failed" ? (errorMessage ?? "알 수 없는 오류") : null,
+    })
+    .eq("id", id);
 }
 
 export async function setCheckin(id: string, checkin: boolean): Promise<Registration | null> {
