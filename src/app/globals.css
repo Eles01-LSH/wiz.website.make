@@ -1,0 +1,99 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #0b0b0c;
+  --paper: #ffffff;
+  --mist: #f5f6f8;
+  --line: #e5e7eb;
+  --muted: #6b7280;
+  --accent: #1d4ed8;
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-paper: var(--paper);
+  --color-mist: var(--mist);
+  --color-line: var(--line);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --font-sans: var(--font-noto-sans-kr);
+  --font-serif: var(--font-noto-serif-kr);
+}
+
+html {
+  scroll-behavior: smooth;
+  scroll-padding-top: 5rem;
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-noto-sans-kr), Arial, Helvetica, sans-serif;
+}
+
+/* Selected Clients — infinite logo wall */
+@keyframes logo-marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.logo-track {
+  animation: logo-marquee var(--marquee-duration, 42s) linear infinite;
+}
+
+.logo-track.logo-track-reverse {
+  animation-direction: reverse;
+}
+
+.logo-row:hover .logo-track {
+  animation-play-state: paused;
+}
+
+.logo-wall-mask {
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 6%,
+    black 94%,
+    transparent
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 6%,
+    black 94%,
+    transparent
+  );
+}
+
+.client-logo {
+  filter: grayscale(100%);
+  opacity: 0.6;
+  transform: scale(var(--logo-scale, 1));
+  transition:
+    filter 0.35s ease,
+    opacity 0.35s ease,
+    transform 0.35s ease;
+}
+
+.client-logo:hover {
+  filter: grayscale(0%);
+  opacity: 1;
+  transform: scale(calc(var(--logo-scale, 1) * 1.045));
+}
+
+@media (max-width: 767px) {
+  .client-logo {
+    opacity: 0.72;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logo-track {
+    animation: none;
+  }
+}
