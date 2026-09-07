@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
 
@@ -86,7 +85,6 @@ export default function RegisterPage() {
 
   return (
     <>
-      <Header />
       <main>
         <PageHero
           label="EVENT PRE-REGISTRATION"

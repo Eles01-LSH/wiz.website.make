@@ -3,9 +3,7 @@
 import { useState, type FormEvent } from "react";
 import SectionLabel from "@/components/Eyebrow";
 import Reveal from "@/components/Reveal";
-import { CONTACT_INFO, NAVER_PLACE_URL } from "@/data/contact";
-
-const PROJECT_TYPES = ["FILM", "MOTION", "LIVE", "MEDIA", "기타"];
+import { CONTACT_INFO, NAVER_PLACE_URL, PROJECT_TYPES } from "@/data/contact";
 
 export default function QuickContact() {
   const [submitted, setSubmitted] = useState(false);
@@ -27,6 +25,7 @@ export default function QuickContact() {
           company: form.get("company"),
           contactName: form.get("contactName"),
           phone: form.get("phone"),
+          email: form.get("email"),
           projectType: form.get("projectType"),
           message: form.get("message"),
         }),
@@ -112,21 +111,30 @@ export default function QuickContact() {
                     placeholder="연락처"
                     className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
                   />
-                  <select
-                    name="projectType"
-                    defaultValue=""
+                  <input
+                    required
+                    type="email"
+                    name="email"
+                    placeholder="이메일"
                     className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
-                  >
-                    <option value="" disabled>
-                      프로젝트 종류
-                    </option>
-                    {PROJECT_TYPES.map((type) => (
-                      <option key={type} value={type}>
-                        {type}
-                      </option>
-                    ))}
-                  </select>
+                  />
                 </div>
+
+                <select
+                  required
+                  name="projectType"
+                  defaultValue=""
+                  className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
+                >
+                  <option value="" disabled>
+                    프로젝트 종류
+                  </option>
+                  {PROJECT_TYPES.map((type) => (
+                    <option key={type.en} value={type.en}>
+                      {type.ko} / {type.en}
+                    </option>
+                  ))}
+                </select>
 
                 <textarea
                   required
