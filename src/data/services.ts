@@ -94,7 +94,7 @@ export const DETAILED_SERVICES: DetailedService[] = [
   {
     index: "05",
     title: "공간 미디어",
-    englishTitle: "INTERIOR MEDIA",
+    englishTitle: "SPACE MEDIA",
     icon: DisplayIcon,
     image: "/services/interior-media.jpg",
     desc: "LED, XR, 프로젝션 등 다양한 미디어를 공간에 최적화하여 새로운 경험을 구현합니다.",

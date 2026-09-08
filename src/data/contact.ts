@@ -12,7 +12,7 @@ export const PROJECT_TYPES = [
   { ko: "모션그래픽", en: "MOTION GRAPHICS" },
   { ko: "편집", en: "EDITING" },
   { ko: "라이브 중계", en: "LIVE PRODUCTION" },
-  { ko: "공간 미디어", en: "MEDIA SPACE" },
+  { ko: "공간 미디어", en: "SPACE MEDIA" },
   { ko: "기타", en: "OTHER" },
 ];
 

@@ -26,7 +26,7 @@ export const ABOUT_STATS: Stat[] = [
   { title: "4K / CINEMA", desc: "CINEMATIC PRODUCTION" },
   { title: "MOTION & CGI", desc: "2D · 3D · VFX" },
   { title: "LIVE", desc: "BROADCAST · EVENT · PERFORMANCE" },
-  { title: "MEDIA TECH", desc: "LED · DISPLAY · MEDIA SPACE" },
+  { title: "MEDIA TECH", desc: "LED · DISPLAY · SPACE MEDIA" },
 ];
 
 export type Capability = {

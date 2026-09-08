@@ -1,7 +1,7 @@
 import SectionLabel from "@/components/Eyebrow";
 import Reveal from "@/components/Reveal";
 
-const CAPABILITIES = ["FILM", "MOTION", "LIVE", "MEDIA"];
+const CAPABILITIES = ["FILM", "MOTION", "EDITING", "LIVE", "MEDIA"];
 
 export default function Identity() {
   return (
