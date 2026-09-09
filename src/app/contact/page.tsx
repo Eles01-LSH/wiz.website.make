@@ -6,6 +6,7 @@ import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
 import NaverMap from "@/components/NaverMap";
 import { PaperclipIcon, XIcon } from "@/components/icons";
+import { createClient } from "@/lib/supabase/client";
 import {
   CONTACT_INFO,
   NAVER_PLACE_URL,
@@ -14,6 +15,7 @@ import {
   ALLOWED_ATTACHMENT_EXTENSIONS,
   MAX_ATTACHMENT_SIZE_MB,
   MAX_TOTAL_ATTACHMENT_SIZE_MB,
+  CONTACT_ATTACHMENTS_BUCKET,
 } from "@/data/contact";
 
 const ADDRESS = CONTACT_INFO.find((info) => info.label === "ADDRESS")?.value ?? "";
@@ -30,21 +32,26 @@ function isAllowedFile(file: File) {
   return ALLOWED_ATTACHMENT_EXTENSIONS.includes(ext);
 }
 
-function fileToBase64(file: File): Promise<{ filename: string; content: string }> {
-  return new Promise((resolve, reject) => {
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      resolve({ filename: file.name, content: result.split(",")[1] ?? "" });
-    };
-    reader.onerror = () => reject(reader.error);
-    reader.readAsDataURL(file);
-  });
+async function uploadFile(file: File): Promise<{ filename: string; path: string }> {
+  const supabase = createClient();
+
+  // Supabase Storage 키는 공백·한글 등이 섞이면 InvalidKey로 거부되므로,
+  // 저장 경로는 UUID(+확장자)만 쓰고 원래 파일명은 이메일 표시용으로 따로 넘긴다.
+  const ext = file.name.includes(".") ? file.name.slice(file.name.lastIndexOf(".")) : "";
+  const uniquePath = `${crypto.randomUUID()}${ext}`;
+
+  const { error } = await supabase.storage
+    .from(CONTACT_ATTACHMENTS_BUCKET)
+    .upload(uniquePath, file);
+
+  if (error) throw error;
+  return { filename: file.name, path: uniquePath };
 }
 
 export default function ContactPage() {
   const [submitted, setSubmitted] = useState(false);
   const [sending, setSending] = useState(false);
+  const [uploadingFiles, setUploadingFiles] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [files, setFiles] = useState<File[]>([]);
   const [fileError, setFileError] = useState<string | null>(null);
@@ -99,7 +106,15 @@ export default function ContactPage() {
     const form = new FormData(e.currentTarget);
 
     try {
-      const attachments = await Promise.all(files.map(fileToBase64));
+      let attachments: { filename: string; path: string }[] = [];
+      if (files.length > 0) {
+        setUploadingFiles(true);
+        try {
+          attachments = await Promise.all(files.map(uploadFile));
+        } finally {
+          setUploadingFiles(false);
+        }
+      }
 
       const res = await fetch("/api/contact", {
         method: "POST",
@@ -318,7 +333,11 @@ export default function ContactPage() {
                       disabled={sending}
                       className="inline-flex w-fit items-center gap-2 self-end rounded-md bg-accent px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-ink disabled:cursor-not-allowed disabled:opacity-60"
                     >
-                      {sending ? "전송 중..." : "프로젝트 상담 시작하기"}
+                      {uploadingFiles
+                        ? "첨부파일 업로드 중..."
+                        : sending
+                          ? "전송 중..."
+                          : "프로젝트 상담 시작하기"}
                       {!sending && <span aria-hidden>→</span>}
                     </button>
                     <p className="text-xs text-muted">

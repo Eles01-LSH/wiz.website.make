@@ -22,7 +22,7 @@ function isAttachment(value: unknown): value is ContactAttachment {
     !!value &&
     typeof value === "object" &&
     typeof (value as ContactAttachment).filename === "string" &&
-    typeof (value as ContactAttachment).content === "string"
+    typeof (value as ContactAttachment).path === "string"
   );
 }
 

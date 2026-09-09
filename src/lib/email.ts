@@ -1,11 +1,39 @@
 import nodemailer from "nodemailer";
-import { CONTACT_INFO } from "@/data/contact";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { CONTACT_INFO, CONTACT_ATTACHMENTS_BUCKET } from "@/data/contact";
 
 const NAVER_MAIL_USER = process.env.NAVER_MAIL_USER;
 const NAVER_MAIL_PASSWORD = process.env.NAVER_MAIL_PASSWORD;
 const TO_EMAIL = CONTACT_INFO.find((info) => info.label === "EMAIL")?.value ?? "";
 
-export type ContactAttachment = { filename: string; content: string };
+// 첨부파일은 Supabase Storage에 브라우저가 직접 업로드한 뒤, 여기서는
+// 그 저장 경로(path)만 받아 서명된 다운로드 링크를 만든다 — 실제 파일
+// 바이트는 이메일 발송 요청 본문에 실리지 않는다.
+export type ContactAttachment = { filename: string; path: string };
+
+const SIGNED_URL_EXPIRY_SECONDS = 60 * 60 * 24 * 30; // 30일
+
+async function createAttachmentLinks(attachments: ContactAttachment[]) {
+  if (attachments.length === 0) return [];
+
+  const supabase = createAdminClient();
+  const links: { filename: string; url: string }[] = [];
+
+  for (const attachment of attachments) {
+    const { data, error } = await supabase.storage
+      .from(CONTACT_ATTACHMENTS_BUCKET)
+      .createSignedUrl(attachment.path, SIGNED_URL_EXPIRY_SECONDS);
+
+    if (error || !data?.signedUrl) {
+      console.error("첨부파일 링크 생성 실패:", attachment.path, error);
+      continue;
+    }
+
+    links.push({ filename: attachment.filename, url: data.signedUrl });
+  }
+
+  return links;
+}
 
 export type ContactPayload = {
   company?: string;
@@ -75,11 +103,27 @@ export async function sendContactEmail(payload: ContactPayload) {
     )
     .join("");
 
+  const attachmentLinks = await createAttachmentLinks(payload.attachments ?? []);
+  const attachmentsHtml = attachmentLinks.length
+    ? `
+      <p style="margin-top:20px;font-weight:700;">첨부 자료 (링크는 30일간 유효)</p>
+      <ul style="margin:8px 0 0;padding-left:18px;">
+        ${attachmentLinks
+          .map(
+            (a) =>
+              `<li><a href="${a.url}" style="color:#1d4ed8;">${escapeHtml(a.filename)}</a></li>`
+          )
+          .join("")}
+      </ul>
+    `
+    : "";
+
   const html = `
     <div style="font-family:sans-serif;font-size:14px;color:#0b0b0c;">
       <h2 style="margin:0 0 16px;">새로운 제작 문의가 도착했습니다</h2>
       <table style="border-collapse:collapse;">${rowsHtml}</table>
       <p style="margin-top:16px;white-space:pre-wrap;line-height:1.6;">${escapeHtml(payload.message)}</p>
+      ${attachmentsHtml}
     </div>
   `;
 
@@ -89,10 +133,5 @@ export async function sendContactEmail(payload: ContactPayload) {
     replyTo: payload.email || undefined,
     subject: `[WIZ CNI 문의] ${payload.company || payload.contactName || "새 문의"}`,
     html,
-    attachments: payload.attachments?.map((a) => ({
-      filename: a.filename,
-      content: a.content,
-      encoding: "base64" as const,
-    })),
   });
 }
