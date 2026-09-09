@@ -37,4 +37,9 @@ export const ALLOWED_ATTACHMENT_EXTENSIONS = [
   ".zip",
 ];
 
-export const MAX_ATTACHMENT_SIZE_MB = 20;
+// Vercel 서버리스 함수의 요청 본문 크기 제한(약 4.5MB)과 base64 인코딩 오버헤드(약 33%)를
+// 감안한 안전한 최대치. 이보다 크게 잡으면 실제로는 전송 자체가 실패한다.
+export const MAX_ATTACHMENT_SIZE_MB = 3;
+
+// 첨부파일 여러 개를 합친 전체 용량 한계 (역시 같은 요청 본문 크기 제한 때문에 필요).
+export const MAX_TOTAL_ATTACHMENT_SIZE_MB = 3;

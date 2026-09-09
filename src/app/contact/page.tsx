@@ -13,10 +13,12 @@ import {
   BUDGET_RANGES,
   ALLOWED_ATTACHMENT_EXTENSIONS,
   MAX_ATTACHMENT_SIZE_MB,
+  MAX_TOTAL_ATTACHMENT_SIZE_MB,
 } from "@/data/contact";
 
 const ADDRESS = CONTACT_INFO.find((info) => info.label === "ADDRESS")?.value ?? "";
 const MAX_ATTACHMENT_BYTES = MAX_ATTACHMENT_SIZE_MB * 1024 * 1024;
+const MAX_TOTAL_ATTACHMENT_BYTES = MAX_TOTAL_ATTACHMENT_SIZE_MB * 1024 * 1024;
 
 function formatFileSize(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))}KB`;
@@ -54,6 +56,7 @@ export default function ContactPage() {
 
     const accepted: File[] = [];
     let error: string | null = null;
+    let runningTotal = files.reduce((sum, f) => sum + f.size, 0);
 
     Array.from(list).forEach((file) => {
       if (!isAllowedFile(file)) {
@@ -64,6 +67,11 @@ export default function ContactPage() {
         error = `파일 용량이 ${MAX_ATTACHMENT_SIZE_MB}MB를 초과합니다: ${file.name}`;
         return;
       }
+      if (runningTotal + file.size > MAX_TOTAL_ATTACHMENT_BYTES) {
+        error = `첨부파일 전체 용량은 ${MAX_TOTAL_ATTACHMENT_SIZE_MB}MB를 넘을 수 없습니다: ${file.name}`;
+        return;
+      }
+      runningTotal += file.size;
       accepted.push(file);
     });
 
