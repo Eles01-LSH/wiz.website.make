@@ -17,6 +17,22 @@ const SMS_STATUS_LABELS: Record<Registration["smsStatus"], string> = {
   failed: "실패",
 };
 
+function SmsStatusBadge({ status }: { status: Registration["smsStatus"] }) {
+  return (
+    <span
+      className={`rounded-md px-2 py-1 text-xs font-semibold ${
+        status === "sent"
+          ? "bg-accent/10 text-accent"
+          : status === "failed"
+            ? "bg-red-500/10 text-red-500"
+            : "bg-mist text-muted"
+      }`}
+    >
+      {SMS_STATUS_LABELS[status]}
+    </span>
+  );
+}
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString("ko-KR", {
     year: "numeric",
@@ -151,14 +167,16 @@ export default function RegistrationsTable({
               <th className="px-3 py-3">참가구분</th>
               <th className="px-3 py-3">식사여부</th>
               <th className="px-3 py-3">등록일</th>
-              <th className="px-3 py-3">문자발송</th>
+              <th className="px-3 py-3">사전예약 확인</th>
+              <th className="px-3 py-3">하루전날 안내</th>
+              <th className="px-3 py-3">당일 안내</th>
               <th className="px-3 py-3">체크인</th>
             </tr>
           </thead>
           <tbody>
             {filtered.length === 0 ? (
               <tr>
-                <td colSpan={12} className="px-4 py-10 text-center text-muted">
+                <td colSpan={14} className="px-4 py-10 text-center text-muted">
                   조건에 맞는 참가자가 없습니다.
                 </td>
               </tr>
@@ -176,17 +194,13 @@ export default function RegistrationsTable({
                   <td className="px-3 py-3 text-ink">{r.meal ? "신청" : "미신청"}</td>
                   <td className="px-3 py-3 text-muted">{formatDate(r.createdAt)}</td>
                   <td className="px-3 py-3">
-                    <span
-                      className={`rounded-md px-2 py-1 text-xs font-semibold ${
-                        r.smsStatus === "sent"
-                          ? "bg-accent/10 text-accent"
-                          : r.smsStatus === "failed"
-                            ? "bg-red-500/10 text-red-500"
-                            : "bg-mist text-muted"
-                      }`}
-                    >
-                      {SMS_STATUS_LABELS[r.smsStatus]}
-                    </span>
+                    <SmsStatusBadge status={r.smsStatus} />
+                  </td>
+                  <td className="px-3 py-3">
+                    <SmsStatusBadge status={r.reminderSmsStatus} />
+                  </td>
+                  <td className="px-3 py-3">
+                    <SmsStatusBadge status={r.ddaySmsStatus} />
                   </td>
                   <td className="px-3 py-3">
                     <button

@@ -6,6 +6,9 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export type ParticipantCategory = "medical" | "public" | "etc";
 export type SmsStatus = "pending" | "sent" | "failed";
 
+/** 문자 발송 종류: 사전예약 확인 / 행사 하루전날 안내 / 행사 당일 안내 */
+export type SmsKind = "registration" | "reminder" | "dday";
+
 export type Registration = {
   id: string;
   name: string;
@@ -20,6 +23,12 @@ export type Registration = {
   smsStatus: SmsStatus;
   smsSentAt: string | null;
   smsError: string | null;
+  reminderSmsStatus: SmsStatus;
+  reminderSmsSentAt: string | null;
+  reminderSmsError: string | null;
+  ddaySmsStatus: SmsStatus;
+  ddaySmsSentAt: string | null;
+  ddaySmsError: string | null;
   createdAt: string;
 };
 
@@ -48,11 +57,17 @@ type RegistrationRow = {
   sms_status: SmsStatus;
   sms_sent_at: string | null;
   sms_error: string | null;
+  reminder_sms_status: SmsStatus;
+  reminder_sms_sent_at: string | null;
+  reminder_sms_error: string | null;
+  dday_sms_status: SmsStatus;
+  dday_sms_sent_at: string | null;
+  dday_sms_error: string | null;
   created_at: string;
 };
 
 const SELECT_COLUMNS =
-  "id, name, organization, department, position, phone, email, category, meal, checkin, sms_status, sms_sent_at, sms_error, created_at";
+  "id, name, organization, department, position, phone, email, category, meal, checkin, sms_status, sms_sent_at, sms_error, reminder_sms_status, reminder_sms_sent_at, reminder_sms_error, dday_sms_status, dday_sms_sent_at, dday_sms_error, created_at";
 
 function toRegistration(row: RegistrationRow): Registration {
   return {
@@ -69,6 +84,12 @@ function toRegistration(row: RegistrationRow): Registration {
     smsStatus: row.sms_status,
     smsSentAt: row.sms_sent_at,
     smsError: row.sms_error,
+    reminderSmsStatus: row.reminder_sms_status,
+    reminderSmsSentAt: row.reminder_sms_sent_at,
+    reminderSmsError: row.reminder_sms_error,
+    ddaySmsStatus: row.dday_sms_status,
+    ddaySmsSentAt: row.dday_sms_sent_at,
+    ddaySmsError: row.dday_sms_error,
     createdAt: row.created_at,
   };
 }
@@ -153,26 +174,46 @@ export async function addRegistration(input: RegistrationInput): Promise<Registr
     smsStatus: "pending",
     smsSentAt: null,
     smsError: null,
+    reminderSmsStatus: "pending",
+    reminderSmsSentAt: null,
+    reminderSmsError: null,
+    ddaySmsStatus: "pending",
+    ddaySmsSentAt: null,
+    ddaySmsError: null,
     createdAt: new Date().toISOString(),
   };
 }
 
+const SMS_COLUMNS: Record<SmsKind, { status: string; sentAt: string; error: string }> = {
+  registration: { status: "sms_status", sentAt: "sms_sent_at", error: "sms_error" },
+  reminder: {
+    status: "reminder_sms_status",
+    sentAt: "reminder_sms_sent_at",
+    error: "reminder_sms_error",
+  },
+  dday: { status: "dday_sms_status", sentAt: "dday_sms_sent_at", error: "dday_sms_error" },
+};
+
 /**
- * 사전등록 확인 문자 발송 결과를 기록한다. 익명 등록 직후(관리자 세션이 없는
- * 상태) 서버에서 자동으로 호출되므로, RLS를 우회하는 service-role 클라이언트를 쓴다.
+ * 문자 발송 결과를 기록한다. kind로 사전예약 확인 / 하루전날 안내 / 당일 안내 중
+ * 어느 문자인지 구분해 서로 다른 컬럼에 기록한다 (한 사람이 세 종류를 각각 받을 수 있음).
+ * 익명 등록 직후(관리자 세션이 없는 상태)에도 호출되므로 RLS를 우회하는
+ * service-role 클라이언트를 쓴다.
  */
 export async function updateSmsStatus(
+  kind: SmsKind,
   id: string,
   status: SmsStatus,
   errorMessage?: string
 ): Promise<void> {
+  const columns = SMS_COLUMNS[kind];
   const supabase = createAdminClient();
   await supabase
     .from("registrations")
     .update({
-      sms_status: status,
-      sms_sent_at: status === "sent" ? new Date().toISOString() : null,
-      sms_error: status === "failed" ? (errorMessage ?? "알 수 없는 오류") : null,
+      [columns.status]: status,
+      [columns.sentAt]: status === "sent" ? new Date().toISOString() : null,
+      [columns.error]: status === "failed" ? (errorMessage ?? "알 수 없는 오류") : null,
     })
     .eq("id", id);
 }
