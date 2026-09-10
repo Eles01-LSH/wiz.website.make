@@ -23,11 +23,9 @@ export default async function AdminDashboardPage() {
         <p className="mt-1 text-sm text-muted">행사 사전등록 현황을 한눈에 확인합니다.</p>
       </div>
 
-      <div className="grid grid-cols-2 gap-4 md:grid-cols-4">
+      <div className="grid grid-cols-2 gap-4">
         <StatCard label="사전등록" value={stats.total} />
         <StatCard label="실제 참석" value={stats.checkedIn} />
-        <StatCard label="문자 발송 성공" value={stats.smsSent} />
-        <StatCard label="문자 발송 실패" value={stats.smsFailed} />
       </div>
 
       <div className="grid grid-cols-2 gap-3 md:grid-cols-5">

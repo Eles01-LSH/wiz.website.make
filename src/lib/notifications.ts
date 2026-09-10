@@ -2,7 +2,7 @@ import "server-only";
 import { SolapiMessageService } from "solapi";
 import type { Registration } from "@/lib/registrations";
 import { updateSmsStatus } from "@/lib/registrations";
-import { EVENT_NAME, EVENT_DATE, EVENT_TIME, EVENT_LOCATION } from "@/data/event";
+import { renderSmsMessage, type BulkSmsKind } from "@/lib/sms-templates";
 
 const API_KEY = process.env.SOLAPI_API_KEY;
 const API_SECRET = process.env.SOLAPI_API_SECRET;
@@ -37,23 +37,19 @@ export async function notifyRegistrationCreated(registration: Registration): Pro
   }
 }
 
-export type BulkSmsKind = "reminder" | "dday";
-
-function buildBulkMessage(kind: BulkSmsKind, name: string): string {
-  if (kind === "reminder") {
-    return `[WIZ CNI] ${name}님, 내일(${EVENT_DATE}) ${EVENT_TIME} ${EVENT_NAME}이 진행됩니다.\n장소: ${EVENT_LOCATION}\n참석에 참고 부탁드립니다.`;
-  }
-  return `[WIZ CNI] ${name}님, 오늘 ${EVENT_TIME} ${EVENT_NAME}이 진행됩니다.\n장소: ${EVENT_LOCATION}\n즐거운 시간 되시길 바랍니다.`;
-}
+export type { BulkSmsKind };
 
 /**
- * 관리자가 선택한 참가자들에게 하루전날/당일 안내 문자를 일괄 발송한다.
+ * 관리자가 선택한 참가자들에게 직접 작성한 문구로 문자를 일괄 발송한다.
+ * messageTemplate 안의 {이름}은 각 수신자 이름으로 치환된다.
  * 한 명씩 순차 발송하며, 각자의 성공/실패를 개별적으로 기록한다
  * (일부만 실패해도 나머지 발송·기록에 영향이 없도록).
+ * "etc"(기타안내)는 참가자 명단에 상태를 표시하지 않는 임시 발송이라 DB에 기록하지 않는다.
  */
 export async function sendBulkNotification(
   kind: BulkSmsKind,
-  registrations: Registration[]
+  registrations: Registration[],
+  messageTemplate: string
 ): Promise<{ sent: number; failed: number }> {
   const messageService = getMessageService();
   if (!messageService) {
@@ -68,14 +64,14 @@ export async function sendBulkNotification(
       await messageService.send({
         to: registration.phone,
         from: SENDER_NUMBER!,
-        text: buildBulkMessage(kind, registration.name),
+        text: renderSmsMessage(messageTemplate, registration.name),
       });
-      await updateSmsStatus(kind, registration.id, "sent");
+      if (kind !== "etc") await updateSmsStatus(kind, registration.id, "sent");
       sent += 1;
     } catch (err) {
       const message = err instanceof Error ? err.message : "알 수 없는 오류";
       console.error(`${kind} 문자 발송 실패 (${registration.id}):`, err);
-      await updateSmsStatus(kind, registration.id, "failed", message);
+      if (kind !== "etc") await updateSmsStatus(kind, registration.id, "failed", message);
       failed += 1;
     }
   }

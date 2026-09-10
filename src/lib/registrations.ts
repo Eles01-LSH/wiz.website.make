@@ -110,28 +110,17 @@ export async function getRegistrations(): Promise<Registration[]> {
 export async function getRegistrationStats() {
   const supabase = await createClient();
 
-  const [{ count: total }, { count: checkedIn }, { count: smsSent }, { count: smsFailed }] =
-    await Promise.all([
-      supabase.from("registrations").select("id", { count: "exact", head: true }),
-      supabase
-        .from("registrations")
-        .select("id", { count: "exact", head: true })
-        .eq("checkin", true),
-      supabase
-        .from("registrations")
-        .select("id", { count: "exact", head: true })
-        .eq("sms_status", "sent"),
-      supabase
-        .from("registrations")
-        .select("id", { count: "exact", head: true })
-        .eq("sms_status", "failed"),
-    ]);
+  const [{ count: total }, { count: checkedIn }] = await Promise.all([
+    supabase.from("registrations").select("id", { count: "exact", head: true }),
+    supabase
+      .from("registrations")
+      .select("id", { count: "exact", head: true })
+      .eq("checkin", true),
+  ]);
 
   return {
     total: total ?? 0,
     checkedIn: checkedIn ?? 0,
-    smsSent: smsSent ?? 0,
-    smsFailed: smsFailed ?? 0,
   };
 }
 

@@ -24,7 +24,7 @@ export default async function AdminDashboardLayout({
   return (
     <div className="min-h-screen bg-mist">
       <header className="sticky top-0 z-40 border-b border-line bg-paper">
-        <div className="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-6 py-4">
+        <div className="mx-auto flex max-w-[1400px] flex-wrap items-center justify-between gap-4 px-6 py-4">
           <div className="flex items-center gap-8">
             <p className="text-sm font-black tracking-[0.2em] text-ink">WIZ CNI EVENT SYSTEM</p>
             <nav className="hidden items-center gap-5 md:flex">
@@ -59,7 +59,7 @@ export default async function AdminDashboardLayout({
         </nav>
       </header>
 
-      <div className="mx-auto max-w-6xl px-6 py-8">{children}</div>
+      <div className="mx-auto max-w-[1400px] px-6 py-8">{children}</div>
     </div>
   );
 }

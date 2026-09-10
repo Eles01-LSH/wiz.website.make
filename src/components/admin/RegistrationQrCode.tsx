@@ -1,13 +1,23 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useSyncExternalStore } from "react";
 import QRCode from "qrcode";
+
+function subscribe() {
+  return () => {};
+}
+
+function getSnapshot() {
+  return `${window.location.origin}/register`;
+}
+
+function getServerSnapshot() {
+  return null;
+}
 
 export default function RegistrationQrCode() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [url] = useState<string | null>(() =>
-    typeof window !== "undefined" ? `${window.location.origin}/register` : null
-  );
+  const url = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
 
   useEffect(() => {
     if (canvasRef.current && url) {

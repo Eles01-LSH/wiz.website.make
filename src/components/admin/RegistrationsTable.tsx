@@ -35,11 +35,12 @@ function SmsStatusBadge({ status }: { status: Registration["smsStatus"] }) {
 
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString("ko-KR", {
-    year: "numeric",
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
     minute: "2-digit",
+    hour12: false,
+    timeZone: "Asia/Seoul",
   });
 }
 
@@ -154,9 +155,9 @@ export default function RegistrationsTable({
       </p>
 
       <div className="overflow-x-auto rounded-md border border-line bg-paper">
-        <table className="w-full min-w-[1180px] border-collapse text-sm">
+        <table className="w-full min-w-[1220px] border-collapse text-sm">
           <thead>
-            <tr className="border-b border-line bg-mist text-left text-xs font-semibold text-muted">
+            <tr className="border-b border-line bg-mist text-left text-xs font-semibold whitespace-nowrap text-muted">
               <th className="px-3 py-3">No</th>
               <th className="px-3 py-3">이름</th>
               <th className="px-3 py-3">소속기관</th>
@@ -182,14 +183,19 @@ export default function RegistrationsTable({
               </tr>
             ) : (
               filtered.map((r, i) => (
-                <tr key={r.id} className="border-b border-line last:border-b-0">
+                <tr key={r.id} className="border-b border-line whitespace-nowrap last:border-b-0">
                   <td className="px-3 py-3 text-muted">{i + 1}</td>
                   <td className="px-3 py-3 font-medium text-ink">{r.name}</td>
                   <td className="px-3 py-3 text-ink">{r.organization || "-"}</td>
                   <td className="px-3 py-3 text-ink">{r.department || "-"}</td>
                   <td className="px-3 py-3 text-ink">{r.position || "-"}</td>
                   <td className="px-3 py-3 text-ink">{r.phone}</td>
-                  <td className="px-3 py-3 text-ink">{r.email || "-"}</td>
+                  <td
+                    className="max-w-[160px] truncate px-3 py-3 text-ink"
+                    title={r.email || undefined}
+                  >
+                    {r.email || "-"}
+                  </td>
                   <td className="px-3 py-3 text-ink">{CATEGORY_LABELS[r.category]}</td>
                   <td className="px-3 py-3 text-ink">{r.meal ? "신청" : "미신청"}</td>
                   <td className="px-3 py-3 text-muted">{formatDate(r.createdAt)}</td>

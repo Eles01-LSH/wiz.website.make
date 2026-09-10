@@ -4,14 +4,14 @@ import { getRegistrations } from "@/lib/registrations";
 import { sendBulkNotification, type BulkSmsKind } from "@/lib/notifications";
 
 function isBulkSmsKind(value: unknown): value is BulkSmsKind {
-  return value === "reminder" || value === "dday";
+  return value === "reminder" || value === "dday" || value === "etc";
 }
 
 export async function POST(request: Request) {
   const auth = await requireAdmin();
   if ("response" in auth) return auth.response;
 
-  let body: { kind?: unknown; ids?: unknown };
+  let body: { kind?: unknown; ids?: unknown; message?: unknown };
   try {
     body = await request.json();
   } catch {
@@ -30,6 +30,14 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "발송 대상을 선택해 주세요." }, { status: 400 });
   }
 
+  const message = typeof body.message === "string" ? body.message.trim() : "";
+  if (!message) {
+    return NextResponse.json({ error: "문자 내용을 입력해 주세요." }, { status: 400 });
+  }
+  if (message.length > 2000) {
+    return NextResponse.json({ error: "문자 내용이 너무 깁니다. (최대 2000자)" }, { status: 400 });
+  }
+
   try {
     const all = await getRegistrations();
     const targets = all.filter((r) => ids.includes(r.id));
@@ -38,7 +46,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: "발송 대상을 찾을 수 없습니다." }, { status: 404 });
     }
 
-    const result = await sendBulkNotification(body.kind, targets);
+    const result = await sendBulkNotification(body.kind, targets, message);
     return NextResponse.json({ ok: true, ...result });
   } catch (err) {
     console.error("bulk sms send failed:", err);

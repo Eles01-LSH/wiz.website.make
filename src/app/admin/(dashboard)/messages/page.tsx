@@ -11,8 +11,8 @@ export default async function AdminMessagesPage() {
       <div>
         <h1 className="text-2xl font-black text-ink">문자 발송 관리</h1>
         <p className="mt-1 text-sm text-muted">
-          체크박스로 대상을 선택한 뒤 하루전날/당일 안내 문자를 발송합니다. 사전예약 확인
-          문자는 등록 즉시 자동으로 발송됩니다.
+          체크박스로 대상을 선택하고 문자 내용을 직접 작성해 하루전날/당일 안내 문자를
+          발송합니다. 사전예약 확인 문자는 등록 즉시 자동으로 발송됩니다.
         </p>
       </div>
 
