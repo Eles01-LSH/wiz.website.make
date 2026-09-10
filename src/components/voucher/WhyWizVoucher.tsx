@@ -14,9 +14,9 @@ export default function WhyWizVoucher() {
             ONE QUALITY.
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-muted md:text-base">
-            여러 제작사를 거치지 않고
+            하나의 팀이 기획부터 후반까지
             <br />
-            기획부터 최종 콘텐츠까지 하나의 제작 시스템으로 관리합니다.
+            전체 비주얼 톤과 퀄리티를 일관되게 관리합니다.
           </p>
         </Reveal>
 

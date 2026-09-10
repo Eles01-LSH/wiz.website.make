@@ -6,6 +6,9 @@ import {
   LayersIcon,
   DisplayIcon,
   TypeIcon,
+  UsersIcon,
+  ThumbsUpIcon,
+  StarIcon,
 } from "@/components/icons";
 import type { ComponentType } from "react";
 
@@ -134,15 +137,28 @@ export const VOUCHER_PROCESS: VoucherProcessStep[] = [
   },
 ];
 
-export type VoucherRating = {
-  value: string;
-  label: string;
+export type VoucherRatingCard = {
+  value: number;
+  labelKo: string;
+  labelEn: string;
+  icon: Icon;
 };
 
-export const VOUCHER_RATINGS: VoucherRating[] = [
-  { value: "9.2 / 10", label: "Overall Satisfaction" },
-  { value: "9.5 / 10", label: "Utilization" },
-  { value: "9.5 / 10", label: "Trust" },
+export const VOUCHER_RATING_CARDS: VoucherRatingCard[] = [
+  { value: 9.2, labelKo: "이용 만족도", labelEn: "CLIENT SATISFACTION", icon: UsersIcon },
+  { value: 9.5, labelKo: "추천 의향", labelEn: "RECOMMENDATION", icon: ThumbsUpIcon },
+  { value: 10, labelKo: "결과물 완성도", labelEn: "QUALITY SCORE", icon: StarIcon },
+];
+
+export type VoucherRatingMetric = { label: string; value: number };
+
+export const VOUCHER_RATING_METRICS: VoucherRatingMetric[] = [
+  { label: "커뮤니케이션", value: 9.0 },
+  { label: "가격", value: 9.0 },
+  { label: "전문성", value: 9.0 },
+  { label: "활용도", value: 9.5 },
+  { label: "신뢰도", value: 9.5 },
+  { label: "재이용 의향", value: 9.0 },
 ];
 
 export const VOUCHER_LINK =

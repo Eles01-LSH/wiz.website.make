@@ -241,6 +241,26 @@ export function PaperclipIcon({ className = "h-5 w-5" }: IconProps) {
   );
 }
 
+export function UsersIcon({ className = "h-7 w-7" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <circle cx="9" cy="8" r="3" />
+      <path d="M3.5 19.5c0-3 2.5-5 5.5-5s5.5 2 5.5 5" />
+      <path d="M15.5 5.5a3 3 0 0 1 0 5.8" />
+      <path d="M17.5 14.8c2.3.4 4 2.2 4 4.7" />
+    </svg>
+  );
+}
+
+export function ThumbsUpIcon({ className = "h-7 w-7" }: IconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" className={className}>
+      <path d="M7 11v9H4a1 1 0 0 1-1-1v-7a1 1 0 0 1 1-1h3Z" />
+      <path d="M7 11l3.5-7a2 2 0 0 1 2 2.2L11.8 9H18a2 2 0 0 1 1.9 2.7l-2.2 6A2 2 0 0 1 15.8 19H9a2 2 0 0 1-2-2" />
+    </svg>
+  );
+}
+
 export function XIcon({ className = "h-4 w-4" }: IconProps) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={1.8} strokeLinecap="round" strokeLinejoin="round" className={className}>
