@@ -16,7 +16,7 @@ export const PROJECT_ROLES = [
   { value: "live-broadcast", label: "Live Production", description: "현장 중계·스위칭·송출 중심" },
   { value: "media-production", label: "Media Production", description: "LED·공간미디어 콘텐츠 제작 중심" },
   { value: "content-production", label: "Content Production", description: "SNS·캠페인 콘텐츠 제작 중심" },
-  { value: "global-promotion", label: "Global Promotion", description: "해외·글로벌 대상 홍보 콘텐츠 제작 중심" },
+  { value: "global-production", label: "Global Production", description: "해외·글로벌 대상 콘텐츠 제작 중심" },
 ] as const;
 
 export type ProjectRole = (typeof PROJECT_ROLES)[number]["value"];
@@ -194,7 +194,7 @@ export const PROJECTS: Project[] = [
   {
     title: "일쌍산업 IDN",
     category: "corporate-film",
-    role: "global-promotion",
+    role: "global-production",
     year: "2024",
     youtubeId: "xLP_STyedW4",
     client: "일쌍산업",
@@ -230,7 +230,7 @@ export const PROJECTS: Project[] = [
   {
     title: "가야고분군 ENG 30초",
     category: "commercial",
-    role: "global-promotion",
+    role: "global-production",
     year: "2018",
     youtubeId: "Q5eDVu0cddA",
     client: "가야고분군",
