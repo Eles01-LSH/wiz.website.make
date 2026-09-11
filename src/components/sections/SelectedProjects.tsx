@@ -1,13 +1,13 @@
 "use client";
 
 import { useState } from "react";
-import Image from "next/image";
 import VideoModal from "@/components/VideoModal";
+import ProjectThumbnail from "@/components/ProjectThumbnail";
 import Reveal from "@/components/Reveal";
 import { PlayIcon } from "@/components/icons";
-import { PROJECTS, type Project } from "@/data/projects";
+import { PROJECTS, getCategoryLabel, sortByYearDesc, type Project } from "@/data/projects";
 
-const FEATURED_PROJECTS = PROJECTS.filter((p) => p.featured);
+const FEATURED_PROJECTS = sortByYearDesc(PROJECTS.filter((p) => p.featured));
 
 export default function SelectedProjects() {
   const [activeProject, setActiveProject] = useState<Project | null>(null);
@@ -40,13 +40,7 @@ export default function SelectedProjects() {
                 className="group block w-full text-left"
               >
                 <div className="relative aspect-video w-full overflow-hidden bg-mist">
-                  <Image
-                    src={`https://img.youtube.com/vi/${project.youtubeId}/maxresdefault.jpg`}
-                    alt={project.title}
-                    fill
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
+                  <ProjectThumbnail youtubeId={project.youtubeId} alt={project.title} />
                   <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
                     <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-ink opacity-0 transition-opacity group-hover:opacity-100">
                       <PlayIcon className="h-6 w-6" />
@@ -57,9 +51,11 @@ export default function SelectedProjects() {
                   <h3 className="text-sm font-bold text-ink">{project.title}</h3>
                   <span className="text-xs font-medium text-muted">{project.year}</span>
                 </div>
-                <span className="mt-1 block text-xs font-semibold text-accent">
-                  {project.category}
-                </span>
+                {project.category && (
+                  <span className="mt-1 block text-xs font-semibold text-accent">
+                    {getCategoryLabel(project.category)}
+                  </span>
+                )}
               </button>
             </Reveal>
           ))}

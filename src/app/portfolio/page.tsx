@@ -1,22 +1,116 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
+import { useEffect, useMemo, useRef, useState } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
+import ProjectThumbnail from "@/components/ProjectThumbnail";
 import VideoModal from "@/components/VideoModal";
-import { PlayIcon } from "@/components/icons";
-import { PROJECTS, type Project, type ProjectCategory } from "@/data/projects";
+import { ChevronDownIcon, PlayIcon } from "@/components/icons";
+import {
+  PROJECTS,
+  PROJECT_CATEGORIES,
+  PROJECT_ROLES,
+  getCategoryLabel,
+  sortByYearDesc,
+  type Project,
+  type ProjectCategory,
+  type ProjectRole,
+} from "@/data/projects";
 
-const CATEGORIES: ("ALL" | ProjectCategory)[] = ["ALL", "FILM", "MOTION", "LIVE", "MEDIA"];
+const ALL = "ALL" as const;
+
+const CATEGORY_OPTIONS: { value: ProjectCategory | typeof ALL; label: string }[] = [
+  { value: ALL, label: "전체" },
+  ...PROJECT_CATEGORIES.map((c) => ({ value: c.value, label: c.label })),
+];
+
+const ROLE_OPTIONS: { value: ProjectRole | typeof ALL; label: string }[] = [
+  { value: ALL, label: "전체" },
+  ...PROJECT_ROLES.map((r) => ({ value: r.value, label: r.label })),
+];
+
+function FilterDropdown<T extends string>({
+  label,
+  options,
+  value,
+  onChange,
+}: {
+  label: string;
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (value: T) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    function onClickOutside(e: MouseEvent) {
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+    }
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, [open]);
+
+  const selected = options.find((o) => o.value === value);
+
+  return (
+    <div ref={ref} className="relative">
+      <button
+        type="button"
+        onClick={() => setOpen((o) => !o)}
+        className={`flex items-center gap-2 rounded-md border px-4 py-2.5 text-xs font-bold tracking-wide transition-colors ${
+          value !== ALL
+            ? "border-accent text-accent"
+            : "border-line text-ink hover:border-accent hover:text-accent"
+        }`}
+      >
+        <span className="text-muted">{label}</span>
+        <span>{selected?.label ?? "전체"}</span>
+        <ChevronDownIcon
+          className={`h-3.5 w-3.5 transition-transform ${open ? "rotate-180" : ""}`}
+        />
+      </button>
+
+      {open && (
+        <div className="absolute left-0 top-full z-20 mt-2 max-h-80 w-64 overflow-y-auto rounded-md border border-line bg-paper py-2 shadow-lg">
+          {options.map((opt) => (
+            <button
+              key={opt.value}
+              type="button"
+              onClick={() => {
+                onChange(opt.value);
+                setOpen(false);
+              }}
+              className={`block w-full px-4 py-2.5 text-left text-sm font-medium transition-colors ${
+                value === opt.value ? "text-accent" : "text-ink hover:bg-mist"
+              }`}
+            >
+              {opt.label}
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 export default function PortfolioPage() {
-  const [active, setActive] = useState<(typeof CATEGORIES)[number]>("ALL");
+  const [category, setCategory] = useState<ProjectCategory | typeof ALL>(ALL);
+  const [role, setRole] = useState<ProjectRole | typeof ALL>(ALL);
   const [activeProject, setActiveProject] = useState<Project | null>(null);
 
-  const filtered =
-    active === "ALL" ? PROJECTS : PROJECTS.filter((p) => p.category === active);
+  const filtered = useMemo(
+    () =>
+      sortByYearDesc(
+        PROJECTS.filter(
+          (p) =>
+            (category === ALL || p.category === category) && (role === ALL || p.role === role)
+        )
+      ),
+    [category, role]
+  );
 
   return (
     <>
@@ -31,54 +125,49 @@ export default function PortfolioPage() {
         <section className="px-6 py-16 md:px-10 md:py-20">
           <div className="mx-auto max-w-7xl">
             <div className="flex flex-wrap gap-3">
-              {CATEGORIES.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setActive(cat)}
-                  className={`rounded-md border px-4 py-2 text-xs font-bold tracking-wide transition-colors ${
-                    active === cat
-                      ? "border-accent bg-accent text-white"
-                      : "border-line text-muted hover:border-accent hover:text-accent"
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+              <FilterDropdown
+                label="CATEGORY"
+                options={CATEGORY_OPTIONS}
+                value={category}
+                onChange={setCategory}
+              />
+              <FilterDropdown label="ROLE" options={ROLE_OPTIONS} value={role} onChange={setRole} />
             </div>
 
-            <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-              {filtered.map((project) => (
-                <button
-                  key={project.title}
-                  type="button"
-                  onClick={() => setActiveProject(project)}
-                  className="group block text-left"
-                >
-                  <div className="relative aspect-video w-full overflow-hidden bg-mist">
-                    <Image
-                      src={`https://img.youtube.com/vi/${project.youtubeId}/maxresdefault.jpg`}
-                      alt={project.title}
-                      fill
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      className="object-cover transition-transform duration-500 group-hover:scale-105"
-                    />
-                    <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
-                      <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-ink opacity-0 transition-opacity group-hover:opacity-100">
-                        <PlayIcon className="h-6 w-6" />
-                      </span>
+            {filtered.length === 0 ? (
+              <p className="mt-16 text-center text-sm text-muted">
+                조건에 맞는 프로젝트가 없습니다.
+              </p>
+            ) : (
+              <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
+                {filtered.map((project) => (
+                  <button
+                    key={project.title}
+                    type="button"
+                    onClick={() => setActiveProject(project)}
+                    className="group block text-left"
+                  >
+                    <div className="relative aspect-video w-full overflow-hidden bg-mist">
+                      <ProjectThumbnail youtubeId={project.youtubeId} alt={project.title} />
+                      <div className="absolute inset-0 flex items-center justify-center bg-black/0 transition-colors group-hover:bg-black/30">
+                        <span className="flex h-14 w-14 items-center justify-center rounded-full bg-white/90 text-ink opacity-0 transition-opacity group-hover:opacity-100">
+                          <PlayIcon className="h-6 w-6" />
+                        </span>
+                      </div>
                     </div>
-                  </div>
-                  <div className="mt-3 flex items-center justify-between">
-                    <h3 className="text-sm font-bold text-ink">{project.title}</h3>
-                    <span className="text-xs font-medium text-muted">{project.year}</span>
-                  </div>
-                  <span className="mt-1 block text-xs font-semibold text-accent">
-                    {project.category}
-                  </span>
-                </button>
-              ))}
-            </div>
+                    <div className="mt-3 flex items-center justify-between">
+                      <h3 className="text-sm font-bold text-ink">{project.title}</h3>
+                      <span className="text-xs font-medium text-muted">{project.year}</span>
+                    </div>
+                    {project.category && (
+                      <span className="mt-1 block text-xs font-semibold text-accent">
+                        {getCategoryLabel(project.category)}
+                      </span>
+                    )}
+                  </button>
+                ))}
+              </div>
+            )}
           </div>
         </section>
       </main>

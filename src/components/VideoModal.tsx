@@ -1,20 +1,12 @@
 "use client";
 
 import { useEffect } from "react";
-import type { Project } from "@/data/projects";
+import { getCategoryLabel, getRoleLabel, type Project } from "@/data/projects";
 
 type VideoModalProps = {
   project: Project | null;
   onClose: () => void;
 };
-
-const FIELDS: { label: string; key: keyof Project }[] = [
-  { label: "CLIENT", key: "client" },
-  { label: "YEAR", key: "year" },
-  { label: "CATEGORY", key: "categoryLabel" },
-  { label: "DURATION", key: "duration" },
-  { label: "ROLE", key: "role" },
-];
 
 export default function VideoModal({ project, onClose }: VideoModalProps) {
   useEffect(() => {
@@ -66,14 +58,18 @@ export default function VideoModal({ project, onClose }: VideoModalProps) {
           <h3 className="text-xl font-black text-ink md:text-2xl">{project.title}</h3>
 
           <div className="mt-6 grid grid-cols-2 gap-x-6 gap-y-5 sm:grid-cols-3 md:grid-cols-5">
-            {FIELDS.map((field) => (
+            {[
+              { label: "CLIENT", value: project.client },
+              { label: "YEAR", value: project.year },
+              { label: "CATEGORY", value: getCategoryLabel(project.category) },
+              { label: "DURATION", value: project.duration },
+              { label: "ROLE", value: getRoleLabel(project.role) },
+            ].map((field) => (
               <div key={field.label}>
                 <p className="text-[10px] font-bold tracking-[0.2em] text-muted">
                   {field.label}
                 </p>
-                <p className="mt-1.5 text-sm font-semibold text-ink">
-                  {project[field.key]}
-                </p>
+                <p className="mt-1.5 text-sm font-semibold text-ink">{field.value}</p>
               </div>
             ))}
           </div>
