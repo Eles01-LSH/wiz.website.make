@@ -12,13 +12,11 @@ export type ProjectCategory = (typeof PROJECT_CATEGORIES)[number]["value"];
 
 export const PROJECT_ROLES = [
   { value: "full-production", label: "Full Production", description: "기획부터 촬영·후반까지 전체 제작" },
-  { value: "film-production", label: "Film Production", description: "영상 제작 중심" },
-  { value: "creative-direction", label: "Creative Direction", description: "콘셉트·비주얼 방향 중심" },
   { value: "motion-cg", label: "Motion & CG", description: "2D·3D 모션그래픽, CG, 합성 중심" },
-  { value: "post-production", label: "Post Production", description: "편집·색보정·후반 중심" },
   { value: "live-broadcast", label: "Live Production", description: "현장 중계·스위칭·송출 중심" },
   { value: "media-production", label: "Media Production", description: "LED·공간미디어 콘텐츠 제작 중심" },
   { value: "content-production", label: "Content Production", description: "SNS·캠페인 콘텐츠 제작 중심" },
+  { value: "global-promotion", label: "Global Promotion", description: "해외·글로벌 대상 홍보 콘텐츠 제작 중심" },
 ] as const;
 
 export type ProjectRole = (typeof PROJECT_ROLES)[number]["value"];
@@ -191,6 +189,78 @@ export const PROJECTS: Project[] = [
     duration: "00:20",
     description:
       "국제차문화전시회의 핵심 이미지와 행사 분위기를 20초 안에 압축해 전달한 프로모션 영상입니다. 짧은 러닝타임 안에서 전시회의 정체성과 주요 볼거리를 빠르게 인지할 수 있도록 구성하고, 리듬감 있는 편집과 시각적 임팩트를 통해 행사에 대한 관심과 방문을 유도했습니다.",
+    featured: false,
+  },
+  {
+    title: "일쌍산업 IDN",
+    category: "corporate-film",
+    role: "global-promotion",
+    year: "2024",
+    youtubeId: "xLP_STyedW4",
+    client: "일쌍산업",
+    duration: "02:48",
+    description:
+      "일쌍산업의 농업기계 기술과 제품의 작동 원리를 보다 직관적으로 전달하기 위해 제작한 기업·기술 홍보영상입니다. 제품 구조와 핵심 기능을 3D 그래픽과 시각적 설명으로 구성해 기술적 특징과 효율성을 쉽게 이해할 수 있도록 표현했습니다.",
+    featured: false,
+  },
+  {
+    title: "귀농산어촌 박람회",
+    category: "commercial",
+    role: "motion-cg",
+    year: "2020",
+    youtubeId: "ODyQyYYMB2I",
+    client: "전라남도",
+    duration: "00:25",
+    description:
+      "전라남도 귀농산어촌 박람회의 주요 프로그램과 참여 가치를 효과적으로 전달하기 위해 제작한 프로모션 영상입니다. 귀농·귀어·귀촌을 준비하는 예비 참여자에게 필요한 정보와 박람회의 현장 분위기를 직관적으로 보여주고, 행사에 대한 관심과 참여를 높이는 데 초점을 맞췄습니다.",
+    featured: false,
+  },
+  {
+    title: "가야고분군 홍보영상",
+    category: "commercial",
+    role: "full-production",
+    year: "2018",
+    youtubeId: "2fw9yMtyoZI",
+    client: "가야고분군",
+    duration: "06:52",
+    description:
+      "유네스코 세계유산 가야고분군의 역사적 가치와 공간의 매력을 대중적으로 전달하기 위해 제작한 문화유산 홍보영상입니다. 고분군의 상징적인 풍경과 유산의 디테일을 중심으로 시각적 몰입감을 높이고, 가야 문화의 독창성과 세계유산으로서의 의미를 직관적으로 전달했습니다.",
+    featured: false,
+  },
+  {
+    title: "가야고분군 ENG 30초",
+    category: "commercial",
+    role: "global-promotion",
+    year: "2018",
+    youtubeId: "Q5eDVu0cddA",
+    client: "가야고분군",
+    duration: "00:30",
+    description:
+      "유네스코 세계유산 가야고분군의 역사적 가치와 공간의 아름다움을 30초 안에 압축해 전달한 글로벌 프로모션 영상입니다. 짧은 러닝타임 안에서 고분군의 상징적인 이미지와 문화유산의 분위기를 리드미컬하게 구성해 해외 시청자에게 가야고분군의 매력을 직관적으로 전달했습니다.",
+    featured: false,
+  },
+  {
+    title: "어등산의 한말 호남의병",
+    category: "documentary",
+    role: "full-production",
+    year: "2017",
+    youtubeId: "S8PHnjmxD-k",
+    client: "한국문화원연합회",
+    duration: "44:22",
+    description:
+      "한말 호남의병의 주요 활동지였던 어등산을 중심으로, 일제에 맞서 싸운 호남 의병의 역사와 그 의미를 조명한 역사 다큐멘터리입니다. 어등산에 남아 있는 의병의 흔적과 당시의 시대적 배경을 따라가며, 지역의 항일 역사와 의병 정신을 오늘의 시선으로 되짚어보았습니다.",
+    featured: false,
+  },
+  {
+    title: "How Fun2 홍보",
+    category: "commercial",
+    role: "full-production",
+    year: "2016",
+    youtubeId: "LaPxBCQ-6HU",
+    client: "국립아시아문화전당",
+    duration: "00:30",
+    description:
+      "경쾌하고 직관적인 연출을 통해 브랜드의 즐거운 이미지를 전달한 프로모션 영상입니다. 짧은 호흡의 편집과 리듬감 있는 화면 구성을 활용해 메시지를 빠르게 전달하고, 시청자의 관심을 자연스럽게 끌어낼 수 있도록 제작했습니다.",
     featured: false,
   },
 ];

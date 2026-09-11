@@ -19,6 +19,7 @@ import {
 } from "@/data/projects";
 
 const ALL = "ALL" as const;
+const PAGE_SIZE = 12;
 
 const CATEGORY_OPTIONS: { value: ProjectCategory | typeof ALL; label: string }[] = [
   { value: ALL, label: "전체" },
@@ -99,7 +100,14 @@ function FilterDropdown<T extends string>({
 export default function PortfolioPage() {
   const [category, setCategory] = useState<ProjectCategory | typeof ALL>(ALL);
   const [role, setRole] = useState<ProjectRole | typeof ALL>(ALL);
+  const [page, setPage] = useState(1);
+  const [appliedFilters, setAppliedFilters] = useState({ category, role });
   const [activeProject, setActiveProject] = useState<Project | null>(null);
+
+  if (appliedFilters.category !== category || appliedFilters.role !== role) {
+    setAppliedFilters({ category, role });
+    setPage(1);
+  }
 
   const filtered = useMemo(
     () =>
@@ -111,6 +119,9 @@ export default function PortfolioPage() {
       ),
     [category, role]
   );
+
+  const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
+  const paginated = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
 
   return (
     <>
@@ -140,7 +151,7 @@ export default function PortfolioPage() {
               </p>
             ) : (
               <div className="mt-10 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2 lg:grid-cols-3">
-                {filtered.map((project) => (
+                {paginated.map((project) => (
                   <button
                     key={project.title}
                     type="button"
@@ -166,6 +177,41 @@ export default function PortfolioPage() {
                     )}
                   </button>
                 ))}
+              </div>
+            )}
+
+            {totalPages > 1 && (
+              <div className="mt-14 flex items-center justify-center gap-2">
+                <button
+                  type="button"
+                  disabled={page === 1}
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  className="rounded-md border border-line px-3 py-2 text-xs font-bold text-ink transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  이전
+                </button>
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map((p) => (
+                  <button
+                    key={p}
+                    type="button"
+                    onClick={() => setPage(p)}
+                    className={`flex h-9 w-9 items-center justify-center rounded-md text-xs font-bold transition-colors ${
+                      p === page
+                        ? "bg-accent text-white"
+                        : "border border-line text-ink hover:border-accent hover:text-accent"
+                    }`}
+                  >
+                    {p}
+                  </button>
+                ))}
+                <button
+                  type="button"
+                  disabled={page === totalPages}
+                  onClick={() => setPage((p) => Math.min(totalPages, p + 1))}
+                  className="rounded-md border border-line px-3 py-2 text-xs font-bold text-ink transition-colors hover:border-accent hover:text-accent disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  다음
+                </button>
               </div>
             )}
           </div>
