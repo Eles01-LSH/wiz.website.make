@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Script from "next/script";
 import { MapPinIcon } from "@/components/icons";
 
@@ -58,12 +58,20 @@ type NaverMapProps = {
   address: string;
   fallbackHref: string;
   companyName?: string;
+  /**
+   * 알려진 정확한 좌표(네이버 플레이스 기준). 지정하면 Geocoding API 호출을 건너뛰고
+   * 이 좌표를 그대로 쓴다 — 주소 문자열이 동일해도 Geocoding API 결과가 네이버
+   * 플레이스 좌표와 어긋나는 경우가 있어(관공서 등 엉뚱한 위치로 튀는 현상 확인됨),
+   * 정확한 위치가 필요하면 좌표를 직접 넘기는 편이 안전하다.
+   */
+  coordinates?: { lat: number; lng: number };
 };
 
 export default function NaverMap({
   address,
   fallbackHref,
   companyName = "WIZ CNI",
+  coordinates,
 }: NaverMapProps) {
   const mapRef = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
@@ -126,7 +134,11 @@ export default function NaverMap({
       zoomControlOptions: { position: naver.maps.Position.TOP_RIGHT },
     });
 
-    if (naver.maps.Service) {
+    if (coordinates) {
+      const point = new naver.maps.LatLng(coordinates.lat, coordinates.lng);
+      map.setCenter(point);
+      placeMarker(naver, map, point);
+    } else if (naver.maps.Service) {
       naver.maps.Service.geocode({ query: address }, (status, response) => {
         const result =
           status === naver.maps.Service?.Status.OK ? response.v2?.addresses?.[0] : undefined;
@@ -144,6 +156,14 @@ export default function NaverMap({
       placeMarker(naver, map, initialCenter);
     }
   }
+
+  // next/script는 src 기준으로 중복 삽입을 막기 때문에, 클라이언트 사이드 이동으로
+  // 이 페이지에 다시 들어왔을 때(스크립트가 이전 방문에서 이미 로드된 상태)는
+  // onLoad가 다시 호출되지 않아 지도가 비어 보인다 — 마운트 시점에 이미 로드돼
+  // 있으면 여기서 직접 초기화한다.
+  useEffect(() => {
+    if (window.naver) initMap();
+  }, []);
 
   if (!CLIENT_ID || failed) {
     return (

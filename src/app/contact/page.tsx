@@ -10,6 +10,7 @@ import { createClient } from "@/lib/supabase/client";
 import {
   CONTACT_INFO,
   NAVER_PLACE_URL,
+  OFFICE_COORDINATES,
   PROJECT_TYPES,
   BUDGET_RANGES,
   ALLOWED_ATTACHMENT_EXTENSIONS,
@@ -154,7 +155,11 @@ export default function ContactPage() {
         <section className="px-6 pt-16 pb-10 md:px-10 md:pt-20 md:pb-12">
           <div className="mx-auto grid max-w-7xl grid-cols-1 gap-16 md:grid-cols-[1fr_1.3fr]">
             <div className="flex flex-col gap-8">
-              <NaverMap address={ADDRESS} fallbackHref={NAVER_PLACE_URL} />
+              <NaverMap
+                address={ADDRESS}
+                fallbackHref={NAVER_PLACE_URL}
+                coordinates={OFFICE_COORDINATES}
+              />
 
               <div className="flex flex-col gap-6 border-t border-line pt-6">
                 {CONTACT_INFO.map((info) => (

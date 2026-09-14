@@ -1,11 +1,15 @@
 export const CONTACT_INFO = [
   { label: "TEL", value: "062-383-2838" },
   { label: "EMAIL", value: "wizcni2004@naver.com" },
-  { label: "ADDRESS", value: "전남광주통합특별시 서구 화개중앙로 2, 3층 (금호동)" },
+  { label: "ADDRESS", value: "전남광주 서구 화개중앙로 2 3층" },
   { label: "HOURS", value: "평일 09:00 - 18:00" },
 ];
 
 export const NAVER_PLACE_URL = "https://map.naver.com/p/entry/place/876646054";
+
+// 네이버 플레이스(위 URL)에 등록된 실제 좌표. Geocoding API로 주소 문자열을 변환하면
+// 어긋난 위치(관공서 등)로 튀는 현상이 있어, 플레이스 데이터 기준 좌표를 직접 고정해서 쓴다.
+export const OFFICE_COORDINATES = { lat: 35.1223342, lng: 126.861011 };
 
 export const PROJECT_TYPES = [
   { ko: "영상제작", en: "FILM PRODUCTION" },
