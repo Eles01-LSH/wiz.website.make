@@ -1,23 +1,13 @@
 "use client";
 
-import { useEffect, useRef, useSyncExternalStore } from "react";
+import { useEffect, useRef } from "react";
 import QRCode from "qrcode";
 
-function subscribe() {
-  return () => {};
-}
-
-function getSnapshot() {
-  return `${window.location.origin}/register`;
-}
-
-function getServerSnapshot() {
-  return null;
-}
+const REGISTRATION_URL = "https://cnuhh.vercel.app/register";
 
 export default function RegistrationQrCode() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
-  const url = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const url = REGISTRATION_URL;
 
   useEffect(() => {
     if (canvasRef.current && url) {
