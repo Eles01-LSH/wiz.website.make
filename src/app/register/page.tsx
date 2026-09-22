@@ -87,8 +87,17 @@ export default function RegisterPage() {
     <>
       <main>
         <PageHero
-          label="EVENT PRE-REGISTRATION"
-          title="행사 사전등록"
+          label="2026 공공보건의료 협력체계 구축사업"
+          backgroundImage="/register/hospital.jpg"
+          title={
+            <>
+              전남권역책임의료기관
+              <br />
+              화순전남대학교병원
+              <br />
+              심포지엄 사전등록
+            </>
+          }
           description="아래 정보를 남겨주시면 행사 관련 안내를 순차적으로 전달드립니다."
         />
 
@@ -126,7 +135,6 @@ export default function RegisterPage() {
                     id="organization"
                     type="text"
                     name="organization"
-                    placeholder="WIZ CNI"
                     className="w-full rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
                   />
                 </div>
@@ -140,7 +148,6 @@ export default function RegisterPage() {
                       id="department"
                       type="text"
                       name="department"
-                      placeholder="예: 홍보팀"
                       className="w-full rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
                     />
                   </div>
@@ -152,7 +159,6 @@ export default function RegisterPage() {
                       id="position"
                       type="text"
                       name="position"
-                      placeholder="예: 팀장"
                       className="w-full rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
                     />
                   </div>
@@ -186,32 +192,22 @@ export default function RegisterPage() {
                   />
                 </div>
 
-                <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                  <div>
-                    <label htmlFor="category" className="mb-1.5 block text-xs font-semibold text-muted">
-                      참가구분
-                    </label>
-                    <select
-                      id="category"
-                      name="category"
-                      defaultValue="etc"
-                      className="w-full rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
-                    >
-                      {CATEGORY_OPTIONS.map((opt) => (
-                        <option key={opt.value} value={opt.value}>
-                          {opt.label}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                  <label className="flex items-center gap-2.5 self-end rounded-md border border-line px-4 py-3 text-sm text-ink">
-                    <input
-                      type="checkbox"
-                      name="meal"
-                      className="h-4 w-4 shrink-0 rounded border-line accent-accent"
-                    />
-                    식사를 신청합니다
+                <div>
+                  <label htmlFor="category" className="mb-1.5 block text-xs font-semibold text-muted">
+                    참가구분
                   </label>
+                  <select
+                    id="category"
+                    name="category"
+                    defaultValue="etc"
+                    className="w-full rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
+                  >
+                    {CATEGORY_OPTIONS.map((opt) => (
+                      <option key={opt.value} value={opt.value}>
+                        {opt.label}
+                      </option>
+                    ))}
+                  </select>
                 </div>
 
                 <label className="flex items-start gap-2.5 text-xs text-muted">
