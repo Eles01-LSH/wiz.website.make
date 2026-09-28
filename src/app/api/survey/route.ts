@@ -47,12 +47,20 @@ export async function POST(request: Request) {
 
   const orgType = asTrimmedString(body.orgType);
   const jobType = asTrimmedString(body.jobType);
+  const orgTypeEtc = asTrimmedString(body.orgTypeEtc).slice(0, 200);
+  const jobTypeEtc = asTrimmedString(body.jobTypeEtc).slice(0, 200);
 
   if (!ORG_TYPE_VALUES.includes(orgType as SurveyOrgType)) {
     return NextResponse.json({ error: "근무 기관을 선택해 주세요." }, { status: 400 });
   }
+  if (orgType === "etc" && !orgTypeEtc) {
+    return NextResponse.json({ error: "근무 기관을 직접 입력해 주세요." }, { status: 400 });
+  }
   if (!JOB_TYPE_VALUES.includes(jobType as SurveyJobType)) {
     return NextResponse.json({ error: "직종을 선택해 주세요." }, { status: 400 });
+  }
+  if (jobType === "etc" && !jobTypeEtc) {
+    return NextResponse.json({ error: "직종을 직접 입력해 주세요." }, { status: 400 });
   }
 
   const overallScore = asScore(body.overallScore);
@@ -90,8 +98,6 @@ export async function POST(request: Request) {
   const topicRequest = asTrimmedString(body.topicRequest).slice(0, 1000);
   const mostHelpful = asTrimmedString(body.mostHelpful).slice(0, 1000);
   const improvement = asTrimmedString(body.improvement).slice(0, 1000);
-  const orgTypeEtc = asTrimmedString(body.orgTypeEtc).slice(0, 200);
-  const jobTypeEtc = asTrimmedString(body.jobTypeEtc).slice(0, 200);
 
   try {
     await addSurveyResponse({

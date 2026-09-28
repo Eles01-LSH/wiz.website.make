@@ -4,7 +4,7 @@ export const ORG_TYPE_OPTIONS = [
   { value: "medical_institution", label: "의료기관" },
   { value: "designated_center", label: "정부·지자체 지정센터/지원조직" },
   { value: "academic", label: "대학·연구기관" },
-  { value: "etc", label: "기타" },
+  { value: "etc", label: "기타(직접입력)" },
 ] as const;
 
 export const JOB_TYPE_OPTIONS = [
@@ -14,7 +14,7 @@ export const JOB_TYPE_OPTIONS = [
   { value: "admin", label: "행정직" },
   { value: "health_tech", label: "보건직/의료기사 등" },
   { value: "research_education", label: "연구·교육직" },
-  { value: "etc", label: "기타" },
+  { value: "etc", label: "기타(직접입력)" },
 ] as const;
 
 export type SurveyOrgType = (typeof ORG_TYPE_OPTIONS)[number]["value"];

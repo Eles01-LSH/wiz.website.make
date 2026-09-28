@@ -86,8 +86,16 @@ export default function SurveyPage() {
       setErrorMessage("현재 근무 기관을 선택해 주세요.");
       return;
     }
+    if (orgType === "etc" && !orgTypeEtc.trim()) {
+      setErrorMessage("근무 기관을 직접 입력해 주세요.");
+      return;
+    }
     if (!jobType) {
       setErrorMessage("직종을 선택해 주세요.");
+      return;
+    }
+    if (jobType === "etc" && !jobTypeEtc.trim()) {
+      setErrorMessage("직종을 직접 입력해 주세요.");
       return;
     }
     if (SYMPOSIUM_QUESTIONS.some((q) => !scaleAnswers[q.id])) {
