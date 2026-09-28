@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
 import {
   ORG_TYPE_OPTIONS,
@@ -150,8 +149,7 @@ export default function SurveyPage() {
   }
 
   return (
-    <>
-      <main>
+    <main>
         <PageHero
           label="2026년 전남권역책임의료기관"
           title="화순전남대학교병원 심포지엄 만족도 조사"
@@ -358,8 +356,6 @@ export default function SurveyPage() {
             )}
           </div>
         </section>
-      </main>
-      <Footer />
-    </>
+    </main>
   );
 }
