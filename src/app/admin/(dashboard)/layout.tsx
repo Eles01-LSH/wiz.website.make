@@ -7,6 +7,7 @@ const NAV_LINKS = [
   { href: "/admin", label: "대시보드" },
   { href: "/admin/registrations", label: "참가자 관리" },
   { href: "/admin/messages", label: "문자 발송" },
+  { href: "/admin/survey", label: "설문 결과" },
 ];
 
 export default async function AdminDashboardLayout({

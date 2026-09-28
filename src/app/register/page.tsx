@@ -1,7 +1,6 @@
 "use client";
 
 import { useState, type FormEvent } from "react";
-import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -241,7 +240,23 @@ export default function RegisterPage() {
           </div>
         </section>
       </main>
-      <Footer />
+      <footer className="mt-auto border-t border-line px-6 py-10 md:px-10">
+        <div className="mx-auto max-w-7xl text-left">
+          <p className="text-xs font-semibold tracking-wide text-muted">
+            2026 공공보건의료 협력체계 구축사업
+          </p>
+          <p className="mt-3 text-sm font-bold text-ink">
+            전남권역책임의료기관
+            <br />
+            화순전남대학교병원
+          </p>
+          <p className="mt-4 text-xs text-muted">
+            화순전남대학교병원 공공보건의료사업실
+            <br />
+            T. 061-379-7846, 7848
+          </p>
+        </div>
+      </footer>
     </>
   );
 }

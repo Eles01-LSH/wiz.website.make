@@ -4,7 +4,9 @@ import { getRegistrations } from "@/lib/registrations";
 import { sendBulkNotification, type BulkSmsKind } from "@/lib/notifications";
 
 function isBulkSmsKind(value: unknown): value is BulkSmsKind {
-  return value === "reminder" || value === "dday" || value === "etc";
+  return (
+    value === "registration" || value === "reminder" || value === "dday" || value === "etc"
+  );
 }
 
 export async function POST(request: Request) {

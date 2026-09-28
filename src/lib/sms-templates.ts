@@ -1,9 +1,12 @@
 import { EVENT_NAME, EVENT_DATE, EVENT_TIME, EVENT_LOCATION } from "@/data/event";
 
-export type BulkSmsKind = "reminder" | "dday" | "etc";
+export type BulkSmsKind = "registration" | "reminder" | "dday" | "etc";
 
 /** 관리자 화면에서 "기본 문구 불러오기"에 쓰이는 기본 템플릿. {이름}은 발송 시 각자 이름으로 치환된다. */
 export function buildDefaultBulkMessage(kind: BulkSmsKind): string {
+  if (kind === "registration") {
+    return `[WIZ CNI] {이름}님, ${EVENT_NAME} 사전등록이 완료되었습니다.\n일시: ${EVENT_DATE} ${EVENT_TIME}\n장소: ${EVENT_LOCATION}\n행사 관련 안내를 순차적으로 보내드리겠습니다.`;
+  }
   if (kind === "reminder") {
     return `[WIZ CNI] {이름}님, 내일(${EVENT_DATE}) ${EVENT_TIME} ${EVENT_NAME}이 진행됩니다.\n장소: ${EVENT_LOCATION}\n참석에 참고 부탁드립니다.`;
   }

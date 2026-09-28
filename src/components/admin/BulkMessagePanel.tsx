@@ -134,7 +134,14 @@ export default function BulkMessagePanel({
         return;
       }
 
-      const label = kind === "reminder" ? "하루전날 안내" : kind === "dday" ? "당일 안내" : "기타안내";
+      const label =
+        kind === "registration"
+          ? "사전등록 안내"
+          : kind === "reminder"
+            ? "하루전날 안내"
+            : kind === "dday"
+              ? "당일 안내"
+              : "기타안내";
       setResult(`${label} 문자 발송 완료 — 성공 ${data.sent}건 / 실패 ${data.failed}건`);
       setSelected(new Set());
       router.refresh();
@@ -150,6 +157,16 @@ export default function BulkMessagePanel({
       <div className="flex flex-col gap-4 rounded-md border border-line bg-paper p-4">
         <div className="flex flex-wrap items-center gap-4">
           <span className="text-xs font-semibold text-muted">발송 종류(상태 기록용)</span>
+          <label className="flex items-center gap-1.5 text-sm text-ink">
+            <input
+              type="radio"
+              name="bulk-sms-kind"
+              checked={kind === "registration"}
+              onChange={() => setKind("registration")}
+              className="h-4 w-4 accent-accent"
+            />
+            사전등록 안내
+          </label>
           <label className="flex items-center gap-1.5 text-sm text-ink">
             <input
               type="radio"
