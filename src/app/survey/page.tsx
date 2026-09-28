@@ -163,6 +163,16 @@ export default function SurveyPage() {
               </div>
             ) : (
               <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-10">
+                <div className="rounded-md bg-mist px-5 py-4 text-sm leading-relaxed text-ink">
+                  <p className="font-semibold">안녕하십니까?</p>
+                  <p className="mt-2 text-muted">
+                    본 설문은 2026년 전남권역책임의료기관 화순전남대학교병원 심포지엄에 참석하신
+                    분들의 의견을 수렴하여 향후 행사 운영과 프로그램 개선에 반영하고자
+                    실시합니다. 응답 내용은 통계적 분석 목적으로만 활용되며 익명으로
+                    처리됩니다. 바쁘시더라도 소중한 의견을 부탁드립니다.
+                  </p>
+                </div>
+
                 <div className="flex flex-col gap-5">
                   <h2 className="text-lg font-black text-ink">Ⅰ. 응답자 일반사항</h2>
 
