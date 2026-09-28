@@ -122,6 +122,18 @@ export const PROGRAM_ITEMS: { title: string; presenter: string }[] = [
   },
 ];
 
+/** 엑셀 내보내기 등 좁은 공간에 프로그램명을 표시할 때 쓰는 축약 라벨. PROGRAM_ITEMS와 순서 동일. */
+export const PROGRAM_SHORT_LABELS = [
+  "①국가정책방향(신지명)",
+  "②기본계획방향(유원섭)",
+  "③응급중증전략(조용수)",
+  "④암인프라(정승일)",
+  "⑤심뇌혈관(안준호)",
+  "⑥분만모성(김종운)",
+  "⑦일차의료(김진환)",
+  "⑧패널토론",
+] as const;
+
 export const WILLINGNESS_QUESTION =
   "향후 유사한 공공보건의료·필수의료 심포지엄이 개최될 경우 참여할 의향이 있습니까?";
 
