@@ -81,20 +81,6 @@ export function buildSurveyWorkbook(responses: SurveyResponse[]): { buffer: Buff
   const workbook = XLSX.utils.book_new();
   XLSX.utils.book_append_sheet(workbook, worksheet, "설문응답");
 
-  const legendRows = [
-    { 번호: "①", 발표: "지역 필수의료 강화를 위한 국가 정책방향", 발표자: "신지명 보건복지부 지역필수의료총괄과장" },
-    { 번호: "②", 발표: "3차 공공보건의료 기본계획 방향", 발표자: "유원섭 국립중앙의료원 공공보건의료본부장" },
-    { 번호: "③", 발표: "[응급·중증 분야] 초광역단위 중증응급의료체계 구축을 위한 전략", 발표자: "조용수 전남대학교병원 광주응급의료지원단장" },
-    { 번호: "④", 발표: "[암 분야] 지역완결적 암 치료 인프라 구축, 현황과 미래", 발표자: "정승일 화순전남대학교병원 기획조정실장" },
-    { 번호: "⑤", 발표: "[심뇌혈관 분야] 심뇌혈관센터 중심 신속대응체계의 발전방향", 발표자: "안준호 전남대학교병원 순환기내과 교수" },
-    { 번호: "⑥", 발표: "[분만·모성 분야] 지역완결적 모자의료 안전망 구축을 위한 실행과제", 발표자: "김종운 전남대학교병원 권역모자의료센터장" },
-    { 번호: "⑦", 발표: "[일차의료 분야] 보건기관 기능개편을 통한 일차의료 공백 해소", 발표자: "김진환 경희의대 예방의학교실 교수" },
-    { 번호: "⑧", 발표: "패널 토론: 함께 만드는 광주·전남 필수의료의 미래", 발표자: "" },
-  ];
-  const legendSheet = XLSX.utils.json_to_sheet(legendRows);
-  legendSheet["!cols"] = [{ wch: 4 }, { wch: 50 }, { wch: 40 }];
-  XLSX.utils.book_append_sheet(workbook, legendSheet, "프로그램목록");
-
   const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
   const dateStamp = new Date().toISOString().slice(0, 10).replace(/-/g, "");
   const filename = `${EVENT_EXPORT_LABEL}_설문응답_${dateStamp}.xlsx`;
