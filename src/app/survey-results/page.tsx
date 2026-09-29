@@ -1,5 +1,6 @@
 import { getSurveyResponsesPublic } from "@/lib/survey";
 import SurveyResultsView from "@/components/SurveyResultsView";
+import SurveyQrCode from "@/components/SurveyQrCode";
 
 export const dynamic = "force-dynamic";
 
@@ -32,6 +33,10 @@ export default async function SurveyResultsPage() {
       </div>
 
       <SurveyResultsView responses={responses} />
+
+      <div className="mt-10">
+        <SurveyQrCode />
+      </div>
     </main>
   );
 }
