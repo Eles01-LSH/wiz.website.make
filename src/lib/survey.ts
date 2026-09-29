@@ -1,6 +1,7 @@
 import "server-only";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import type { SurveyOrgType, SurveyJobType } from "@/data/survey";
 
 export type SurveyResponse = {
@@ -89,6 +90,24 @@ function toSurveyResponse(row: SurveyResponseRow): SurveyResponse {
 /** 관리자 세션(RLS: is_admin())으로만 성공한다. */
 export async function getSurveyResponses(): Promise<SurveyResponse[]> {
   const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("survey_responses")
+    .select(SELECT_COLUMNS)
+    .order("created_at", { ascending: false });
+
+  if (error) throw new Error(error.message);
+  return (data as SurveyResponseRow[]).map(toSurveyResponse);
+}
+
+/**
+ * 로그인 없이 접근 가능한 공개 결과 페이지(/survey-results)에서 호출.
+ * 관리자 세션이 없어 RLS(is_admin())를 통과할 수 없으므로, RLS를 우회하는
+ * service-role 클라이언트로 조회한다. 이 함수를 호출하는 라우트는
+ * "누구나 볼 수 있어야 한다"는 요구사항으로 의도적으로 도입된 것이므로,
+ * 이 함수 자체가 접근 제어의 마지막 경계다 — 새 호출부를 추가할 때 주의할 것.
+ */
+export async function getSurveyResponsesPublic(): Promise<SurveyResponse[]> {
+  const supabase = createAdminClient();
   const { data, error } = await supabase
     .from("survey_responses")
     .select(SELECT_COLUMNS)
