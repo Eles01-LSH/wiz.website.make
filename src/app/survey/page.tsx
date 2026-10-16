@@ -175,7 +175,11 @@ export default function SurveyPage() {
                     <label className="mb-1.5 block text-xs font-semibold text-muted">
                       {q.number}. {q.label}
                     </label>
-                    <p className="mb-1.5 text-xs text-muted/80">※ {q.note}</p>
+                    {q.notes.map((note, idx) => (
+                      <p key={idx} className="mb-1.5 text-xs text-muted/80">
+                        ※ {note}
+                      </p>
+                    ))}
                     <textarea
                       rows={3}
                       value={freeText[q.id]}
@@ -220,7 +224,11 @@ export default function SurveyPage() {
                     <label className="mb-1.5 block text-xs font-semibold text-muted">
                       {q.number}. {q.label}
                     </label>
-                    <p className="mb-1.5 text-xs text-muted/80">※ {q.note}</p>
+                    {q.notes.map((note, idx) => (
+                      <p key={idx} className="mb-1.5 text-xs text-muted/80">
+                        ※ {note}
+                      </p>
+                    ))}
                     <textarea
                       rows={3}
                       value={freeText[q.id]}
