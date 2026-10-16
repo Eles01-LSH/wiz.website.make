@@ -22,12 +22,12 @@ export default function PageHero({ label, title, description, backgroundImage }:
         />
         <div className="absolute inset-0 bg-gradient-to-b from-black/70 via-black/55 to-black/70" />
         <div className="relative mx-auto max-w-7xl">
-          <SectionLabel className="text-white/80">{label}</SectionLabel>
-          <h1 className="mt-4 text-3xl font-black text-white drop-shadow-md sm:text-4xl md:text-5xl">
+          <SectionLabel className="break-keep text-white/80">{label}</SectionLabel>
+          <h1 className="mt-4 break-keep text-3xl font-black text-white drop-shadow-md sm:text-4xl md:text-5xl">
             {title}
           </h1>
           {description && (
-            <p className="mt-4 max-w-2xl text-sm leading-relaxed text-white/90 drop-shadow md:text-base">
+            <p className="mt-4 max-w-2xl break-keep text-sm leading-relaxed text-white/90 drop-shadow md:text-base">
               {description}
             </p>
           )}
@@ -39,12 +39,12 @@ export default function PageHero({ label, title, description, backgroundImage }:
   return (
     <section className="border-b border-line bg-mist px-6 py-16 md:px-10 md:py-20">
       <div className="mx-auto max-w-7xl">
-        <SectionLabel>{label}</SectionLabel>
-        <h1 className="mt-4 text-3xl font-black text-ink sm:text-4xl md:text-5xl">
+        <SectionLabel className="break-keep">{label}</SectionLabel>
+        <h1 className="mt-4 break-keep text-3xl font-black text-ink sm:text-4xl md:text-5xl">
           {title}
         </h1>
         {description && (
-          <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
+          <p className="mt-4 max-w-2xl break-keep text-sm leading-relaxed text-muted md:text-base">
             {description}
           </p>
         )}

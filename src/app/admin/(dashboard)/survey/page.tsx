@@ -13,7 +13,7 @@ export default async function AdminSurveyPage() {
         <div>
           <h1 className="text-2xl font-black text-ink">설문 결과</h1>
           <p className="mt-1 text-sm text-muted">
-            총 {total.toLocaleString("ko-KR")}건 응답. 심포지엄 만족도 조사(/survey) 응답을 종합해서 보여줍니다.
+            총 {total.toLocaleString("ko-KR")}건 응답. 지역필수의료 현장 의견수렴(/survey) 응답을 종합해서 보여줍니다.
           </p>
         </div>
         {total > 0 && (

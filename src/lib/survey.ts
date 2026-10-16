@@ -2,87 +2,55 @@ import "server-only";
 import { randomUUID } from "crypto";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import type { SurveyOrgType, SurveyJobType } from "@/data/survey";
+import type { SurveyOrgType, SurveyRegion, SurveyFutureFormat } from "@/data/survey";
 
 export type SurveyResponse = {
   id: string;
   orgType: SurveyOrgType;
-  orgTypeEtc: string;
-  jobType: SurveyJobType;
-  jobTypeEtc: string;
-  overallScore: number;
-  relevanceScore: number;
-  policyUnderstandingScore: number;
-  fieldPresentationScore: number;
-  panelDiscussionScore: number;
-  operationScore: number;
-  programScores: number[];
-  willingnessScore: number;
-  topicRequest: string;
-  mostHelpful: string;
-  improvement: string;
+  region: SurveyRegion;
+  policyQuestion: string;
+  priorityTask: string;
+  futureFormat: SurveyFutureFormat;
+  additionalTopics: string;
+  operationFeedback: string;
   createdAt: string;
 };
 
 export type SurveyResponseInput = {
   orgType: SurveyOrgType;
-  orgTypeEtc?: string;
-  jobType: SurveyJobType;
-  jobTypeEtc?: string;
-  overallScore: number;
-  relevanceScore: number;
-  policyUnderstandingScore: number;
-  fieldPresentationScore: number;
-  panelDiscussionScore: number;
-  operationScore: number;
-  programScores: number[];
-  willingnessScore: number;
-  topicRequest?: string;
-  mostHelpful?: string;
-  improvement?: string;
+  region: SurveyRegion;
+  policyQuestion?: string;
+  priorityTask?: string;
+  futureFormat: SurveyFutureFormat;
+  additionalTopics?: string;
+  operationFeedback?: string;
 };
 
 type SurveyResponseRow = {
   id: string;
   org_type: SurveyOrgType;
-  org_type_etc: string;
-  job_type: SurveyJobType;
-  job_type_etc: string;
-  overall_score: number;
-  relevance_score: number;
-  policy_understanding_score: number;
-  field_presentation_score: number;
-  panel_discussion_score: number;
-  operation_score: number;
-  program_scores: number[];
-  willingness_score: number;
-  topic_request: string;
-  most_helpful: string;
-  improvement: string;
+  region: SurveyRegion;
+  policy_question: string;
+  priority_task: string;
+  future_format: SurveyFutureFormat;
+  additional_topics: string;
+  operation_feedback: string;
   created_at: string;
 };
 
 const SELECT_COLUMNS =
-  "id, org_type, org_type_etc, job_type, job_type_etc, overall_score, relevance_score, policy_understanding_score, field_presentation_score, panel_discussion_score, operation_score, program_scores, willingness_score, topic_request, most_helpful, improvement, created_at";
+  "id, org_type, region, policy_question, priority_task, future_format, additional_topics, operation_feedback, created_at";
 
 function toSurveyResponse(row: SurveyResponseRow): SurveyResponse {
   return {
     id: row.id,
     orgType: row.org_type,
-    orgTypeEtc: row.org_type_etc,
-    jobType: row.job_type,
-    jobTypeEtc: row.job_type_etc,
-    overallScore: row.overall_score,
-    relevanceScore: row.relevance_score,
-    policyUnderstandingScore: row.policy_understanding_score,
-    fieldPresentationScore: row.field_presentation_score,
-    panelDiscussionScore: row.panel_discussion_score,
-    operationScore: row.operation_score,
-    programScores: row.program_scores,
-    willingnessScore: row.willingness_score,
-    topicRequest: row.topic_request,
-    mostHelpful: row.most_helpful,
-    improvement: row.improvement,
+    region: row.region,
+    policyQuestion: row.policy_question,
+    priorityTask: row.priority_task,
+    futureFormat: row.future_format,
+    additionalTopics: row.additional_topics,
+    operationFeedback: row.operation_feedback,
     createdAt: row.created_at,
   };
 }
@@ -102,9 +70,7 @@ export async function getSurveyResponses(): Promise<SurveyResponse[]> {
 /**
  * 로그인 없이 접근 가능한 공개 결과 페이지(/survey-results)에서 호출.
  * 관리자 세션이 없어 RLS(is_admin())를 통과할 수 없으므로, RLS를 우회하는
- * service-role 클라이언트로 조회한다. 이 함수를 호출하는 라우트는
- * "누구나 볼 수 있어야 한다"는 요구사항으로 의도적으로 도입된 것이므로,
- * 이 함수 자체가 접근 제어의 마지막 경계다 — 새 호출부를 추가할 때 주의할 것.
+ * service-role 클라이언트로 조회한다.
  */
 export async function getSurveyResponsesPublic(): Promise<SurveyResponse[]> {
   const supabase = createAdminClient();
@@ -119,8 +85,7 @@ export async function getSurveyResponsesPublic(): Promise<SurveyResponse[]> {
 
 /**
  * 공개 설문 폼에서 호출. 익명 제출자는 SELECT 권한이 없으므로
- * (registrations.ts의 addRegistration과 동일한 이유로) id를 미리 생성해
- * 넣은 뒤 입력값 그대로 조합해 반환한다.
+ * id를 미리 생성해 넣은 뒤 입력값 그대로 조합해 반환한다.
  */
 export async function addSurveyResponse(input: SurveyResponseInput): Promise<SurveyResponse> {
   const supabase = await createClient();
@@ -129,20 +94,12 @@ export async function addSurveyResponse(input: SurveyResponseInput): Promise<Sur
   const row = {
     id,
     org_type: input.orgType,
-    org_type_etc: input.orgTypeEtc?.trim() ?? "",
-    job_type: input.jobType,
-    job_type_etc: input.jobTypeEtc?.trim() ?? "",
-    overall_score: input.overallScore,
-    relevance_score: input.relevanceScore,
-    policy_understanding_score: input.policyUnderstandingScore,
-    field_presentation_score: input.fieldPresentationScore,
-    panel_discussion_score: input.panelDiscussionScore,
-    operation_score: input.operationScore,
-    program_scores: input.programScores,
-    willingness_score: input.willingnessScore,
-    topic_request: input.topicRequest?.trim() ?? "",
-    most_helpful: input.mostHelpful?.trim() ?? "",
-    improvement: input.improvement?.trim() ?? "",
+    region: input.region,
+    policy_question: input.policyQuestion?.trim() ?? "",
+    priority_task: input.priorityTask?.trim() ?? "",
+    future_format: input.futureFormat,
+    additional_topics: input.additionalTopics?.trim() ?? "",
+    operation_feedback: input.operationFeedback?.trim() ?? "",
   };
 
   const { error } = await supabase.from("survey_responses").insert(row);
@@ -151,20 +108,12 @@ export async function addSurveyResponse(input: SurveyResponseInput): Promise<Sur
   return {
     id,
     orgType: row.org_type,
-    orgTypeEtc: row.org_type_etc,
-    jobType: row.job_type,
-    jobTypeEtc: row.job_type_etc,
-    overallScore: row.overall_score,
-    relevanceScore: row.relevance_score,
-    policyUnderstandingScore: row.policy_understanding_score,
-    fieldPresentationScore: row.field_presentation_score,
-    panelDiscussionScore: row.panel_discussion_score,
-    operationScore: row.operation_score,
-    programScores: row.program_scores,
-    willingnessScore: row.willingness_score,
-    topicRequest: row.topic_request,
-    mostHelpful: row.most_helpful,
-    improvement: row.improvement,
+    region: row.region,
+    policyQuestion: row.policy_question,
+    priorityTask: row.priority_task,
+    futureFormat: row.future_format,
+    additionalTopics: row.additional_topics,
+    operationFeedback: row.operation_feedback,
     createdAt: new Date().toISOString(),
   };
 }

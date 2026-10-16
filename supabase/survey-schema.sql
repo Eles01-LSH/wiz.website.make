@@ -1,46 +1,36 @@
--- 심포지엄 만족도 설문 테이블 + RLS 정책 (실제 설문지 문항 기준으로 재구성)
+-- 2026년 지역필수의료 현장 의견수렴 — survey_responses 테이블 + RLS 정책
 -- Supabase 대시보드 > SQL Editor 에서 실행하세요.
--- 기존 survey_responses 테이블(임시 테스트 응답 포함)을 지우고 새 구조로 다시 만듭니다.
+-- 기존 survey_responses 테이블(이전 설문 구조)을 지우고 새 구조로 다시 만듭니다.
 
 drop table if exists public.survey_responses;
 
 create table public.survey_responses (
   id uuid primary key default gen_random_uuid(),
 
-  -- Ⅰ. 응답자 일반사항
+  -- Ⅰ. 응답자 기본현황
   org_type text not null check (
     org_type in (
-      'administration', 'health_center', 'medical_institution',
-      'designated_center', 'academic', 'etc'
+      'tertiary_general', 'general_hospital', 'regional_medical_center', 'clinic',
+      'health_center', 'government', 'academic', 'etc'
     )
   ),
-  org_type_etc text not null default '',
-  job_type text not null check (
-    job_type in (
-      'doctor', 'nurse', 'social_worker', 'admin',
-      'health_tech', 'research_education', 'etc'
+  region text not null check (
+    region in ('gwangju', 'jeonnam', 'gwangju_jeonnam', 'etc')
+  ),
+
+  -- Ⅱ. 심포지엄 관련 질문 및 현장 의견 (자유서술, 선택)
+  policy_question text not null default '',
+  priority_task text not null default '',
+
+  -- Ⅲ. 향후 심포지엄 및 협력사업 운영 방향
+  future_format text not null check (
+    future_format in (
+      'regional_symposium', 'field_small_symposium', 'practice_workshop',
+      'joint_discussion', 'online_hybrid', 'existing_council', 'etc'
     )
   ),
-  job_type_etc text not null default '',
-
-  -- Ⅱ. 심포지엄 만족도 (문항 3~8, 5점 척도)
-  overall_score smallint not null check (overall_score between 1 and 5),
-  relevance_score smallint not null check (relevance_score between 1 and 5),
-  policy_understanding_score smallint not null check (policy_understanding_score between 1 and 5),
-  field_presentation_score smallint not null check (field_presentation_score between 1 and 5),
-  panel_discussion_score smallint not null check (panel_discussion_score between 1 and 5),
-  operation_score smallint not null check (operation_score between 1 and 5),
-
-  -- Ⅲ. 프로그램별 만족도 (문항 9, 8개 항목 각 5점 척도)
-  program_scores smallint[] not null
-    check (array_length(program_scores, 1) = 8)
-    check (program_scores <@ array[1, 2, 3, 4, 5]::smallint[]),
-
-  -- Ⅳ. 향후 운영 및 개선의견
-  willingness_score smallint not null check (willingness_score between 1 and 5),
-  topic_request text not null default '',
-  most_helpful text not null default '',
-  improvement text not null default '',
+  additional_topics text not null default '',
+  operation_feedback text not null default '',
 
   created_at timestamptz not null default now()
 );

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 
 const TITLE = "2026년 전남권역책임의료기관 화순전남대학교병원 심포지엄";
-const DESCRIPTION = "화순전남대학교병원 심포지엄 만족도 조사 결과";
+const DESCRIPTION = "지역필수의료 현장 의견수렴 결과";
 
 export const metadata: Metadata = {
   title: TITLE,

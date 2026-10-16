@@ -1,43 +1,23 @@
 import { type SurveyResponse } from "@/lib/survey";
 import {
   ORG_TYPE_OPTIONS,
-  JOB_TYPE_OPTIONS,
-  SYMPOSIUM_QUESTIONS,
-  PROGRAM_ITEMS,
-  WILLINGNESS_QUESTION,
+  REGION_OPTIONS,
+  FUTURE_FORMAT_OPTIONS,
   FREE_TEXT_QUESTIONS,
-  type ScaleQuestionId,
+  type FreeTextQuestionId,
 } from "@/data/survey";
 
-function average(values: number[]) {
-  if (values.length === 0) return 0;
-  return values.reduce((a, b) => a + b, 0) / values.length;
-}
-
-function getScaleScore(response: SurveyResponse, id: ScaleQuestionId): number {
+function getFreeText(response: SurveyResponse, id: FreeTextQuestionId): string {
   switch (id) {
-    case "overall":
-      return response.overallScore;
-    case "relevance":
-      return response.relevanceScore;
-    case "policyUnderstanding":
-      return response.policyUnderstandingScore;
-    case "fieldPresentation":
-      return response.fieldPresentationScore;
-    case "panelDiscussion":
-      return response.panelDiscussionScore;
-    case "operation":
-      return response.operationScore;
+    case "policyQuestion":
+      return response.policyQuestion;
+    case "priorityTask":
+      return response.priorityTask;
+    case "additionalTopics":
+      return response.additionalTopics;
+    case "operationFeedback":
+      return response.operationFeedback;
   }
-}
-
-function getFreeText(
-  response: SurveyResponse,
-  id: "topicRequest" | "mostHelpful" | "improvement"
-): string {
-  if (id === "topicRequest") return response.topicRequest;
-  if (id === "mostHelpful") return response.mostHelpful;
-  return response.improvement;
 }
 
 function DistributionBar({
@@ -52,8 +32,8 @@ function DistributionBar({
   const pct = total > 0 ? Math.round((count / total) * 100) : 0;
   return (
     <div className="flex items-center gap-2 text-xs text-muted">
-      <span className="w-10 shrink-0">{label}</span>
-      <div className="h-2 flex-1 overflow-hidden rounded-full bg-mist">
+      <span className="min-w-0 flex-1 truncate">{label}</span>
+      <div className="h-2 w-24 shrink-0 overflow-hidden rounded-full bg-mist">
         <div className="h-full rounded-full bg-accent" style={{ width: `${pct}%` }} />
       </div>
       <span className="w-10 shrink-0 text-right">{count}건</span>
@@ -61,22 +41,28 @@ function DistributionBar({
   );
 }
 
-function ScoreCard({ label, values }: { label: string; values: number[] }) {
-  const total = values.length;
-  const avg = average(values);
-  const counts = [0, 0, 0, 0, 0];
-  for (const v of values) counts[v - 1] += 1;
-
+function DistributionCard({
+  title,
+  options,
+  total,
+  countFor,
+}: {
+  title: string;
+  options: readonly { value: string; label: string }[];
+  total: number;
+  countFor: (value: string) => number;
+}) {
   return (
     <div className="rounded-md border border-line bg-paper p-5">
-      <p className="text-xs font-semibold text-muted">{label}</p>
-      <p className="mt-1 text-3xl font-black text-ink">
-        {avg.toFixed(1)}
-        <span className="ml-1 text-sm font-medium text-muted">/ 5.0</span>
-      </p>
+      <p className="text-xs font-semibold text-muted">{title}</p>
       <div className="mt-4 flex flex-col gap-1.5">
-        {counts.map((count, idx) => (
-          <DistributionBar key={idx} count={count} total={total} label={`${idx + 1}점`} />
+        {options.map((opt) => (
+          <DistributionBar
+            key={opt.value}
+            label={opt.label}
+            total={total}
+            count={countFor(opt.value)}
+          />
         ))}
       </div>
     </div>
@@ -96,70 +82,32 @@ export default function SurveyResultsView({ responses }: { responses: SurveyResp
   }
 
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex break-keep flex-col gap-6">
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-        <div className="rounded-md border border-line bg-paper p-5">
-          <p className="text-xs font-semibold text-muted">Ⅰ-1. 근무 기관 분포</p>
-          <div className="mt-4 flex flex-col gap-1.5">
-            {ORG_TYPE_OPTIONS.map((opt) => (
-              <DistributionBar
-                key={opt.value}
-                label={opt.label}
-                total={total}
-                count={responses.filter((r) => r.orgType === opt.value).length}
-              />
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-md border border-line bg-paper p-5">
-          <p className="text-xs font-semibold text-muted">Ⅰ-2. 직종 분포</p>
-          <div className="mt-4 flex flex-col gap-1.5">
-            {JOB_TYPE_OPTIONS.map((opt) => (
-              <DistributionBar
-                key={opt.value}
-                label={opt.label}
-                total={total}
-                count={responses.filter((r) => r.jobType === opt.value).length}
-              />
-            ))}
-          </div>
-        </div>
+        <DistributionCard
+          title="Ⅰ-1. 소속기관 유형 분포"
+          options={ORG_TYPE_OPTIONS}
+          total={total}
+          countFor={(v) => responses.filter((r) => r.orgType === v).length}
+        />
+        <DistributionCard
+          title="Ⅰ-2. 주요 활동지역 분포"
+          options={REGION_OPTIONS}
+          total={total}
+          countFor={(v) => responses.filter((r) => r.region === v).length}
+        />
       </div>
 
-      <div>
-        <h2 className="mb-3 text-sm font-black text-ink">Ⅱ. 심포지엄 만족도</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {SYMPOSIUM_QUESTIONS.map((q) => (
-            <ScoreCard
-              key={q.id}
-              label={q.label}
-              values={responses.map((r) => getScaleScore(r, q.id))}
-            />
-          ))}
-          <ScoreCard
-            label={WILLINGNESS_QUESTION}
-            values={responses.map((r) => r.willingnessScore)}
-          />
-        </div>
-      </div>
+      <DistributionCard
+        title="Ⅲ-5. 향후 선호하는 운영방식"
+        options={FUTURE_FORMAT_OPTIONS}
+        total={total}
+        countFor={(v) => responses.filter((r) => r.futureFormat === v).length}
+      />
 
       <div>
-        <h2 className="mb-3 text-sm font-black text-ink">Ⅲ. 프로그램별 만족도</h2>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {PROGRAM_ITEMS.map((item, idx) => (
-            <ScoreCard
-              key={item.title}
-              label={item.presenter ? `${item.title} — ${item.presenter}` : item.title}
-              values={responses.map((r) => r.programScores[idx])}
-            />
-          ))}
-        </div>
-      </div>
-
-      <div>
-        <h2 className="mb-3 text-sm font-black text-ink">Ⅳ. 서술형 의견</h2>
-        <div className="grid grid-cols-1 gap-4 lg:grid-cols-3">
+        <h2 className="mb-3 text-sm font-black text-ink">현장 의견 (자유서술)</h2>
+        <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
           {FREE_TEXT_QUESTIONS.map((q) => {
             const items = responses
               .map((r) => getFreeText(r, q.id))
@@ -167,7 +115,7 @@ export default function SurveyResultsView({ responses }: { responses: SurveyResp
             return (
               <div key={q.id} className="rounded-md border border-line bg-paper p-5">
                 <h3 className="text-sm font-black text-ink">
-                  {q.label} ({items.length}건)
+                  {q.number}. {q.label} ({items.length}건)
                 </h3>
                 <ul className="mt-3 flex max-h-96 flex-col gap-3 overflow-y-auto">
                   {items.length === 0 ? (
