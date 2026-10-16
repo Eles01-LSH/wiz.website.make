@@ -15,7 +15,9 @@ const FUTURE_FORMAT_VALUES: SurveyFutureFormat[] = FUTURE_FORMAT_OPTIONS.map((o)
 
 type SurveyBody = {
   orgType?: unknown;
+  orgTypeEtc?: unknown;
   region?: unknown;
+  regionEtc?: unknown;
   policyQuestion?: unknown;
   priorityTask?: unknown;
   futureFormat?: unknown;
@@ -36,14 +38,22 @@ export async function POST(request: Request) {
   }
 
   const orgType = asTrimmedString(body.orgType);
+  const orgTypeEtc = asTrimmedString(body.orgTypeEtc).slice(0, 200);
   const region = asTrimmedString(body.region);
+  const regionEtc = asTrimmedString(body.regionEtc).slice(0, 200);
   const futureFormat = asTrimmedString(body.futureFormat);
 
   if (!ORG_TYPE_VALUES.includes(orgType as SurveyOrgType)) {
     return NextResponse.json({ error: "소속기관 유형을 선택해 주세요." }, { status: 400 });
   }
+  if (orgType === "etc" && !orgTypeEtc) {
+    return NextResponse.json({ error: "소속기관 유형을 직접 입력해 주세요." }, { status: 400 });
+  }
   if (!REGION_VALUES.includes(region as SurveyRegion)) {
     return NextResponse.json({ error: "주요 활동지역을 선택해 주세요." }, { status: 400 });
+  }
+  if (region === "etc" && !regionEtc) {
+    return NextResponse.json({ error: "주요 활동지역을 직접 입력해 주세요." }, { status: 400 });
   }
   if (!FUTURE_FORMAT_VALUES.includes(futureFormat as SurveyFutureFormat)) {
     return NextResponse.json(
@@ -60,7 +70,9 @@ export async function POST(request: Request) {
   try {
     await addSurveyResponse({
       orgType: orgType as SurveyOrgType,
+      orgTypeEtc,
       region: region as SurveyRegion,
+      regionEtc,
       futureFormat: futureFormat as SurveyFutureFormat,
       policyQuestion,
       priorityTask,

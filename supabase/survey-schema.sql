@@ -14,9 +14,11 @@ create table public.survey_responses (
       'health_center', 'government', 'academic', 'etc'
     )
   ),
+  org_type_etc text not null default '',
   region text not null check (
     region in ('gwangju', 'jeonnam', 'gwangju_jeonnam', 'etc')
   ),
+  region_etc text not null default '',
 
   -- Ⅱ. 심포지엄 관련 질문 및 현장 의견 (자유서술, 선택)
   policy_question text not null default '',

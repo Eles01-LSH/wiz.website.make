@@ -28,7 +28,9 @@ function autoResize(e: React.FormEvent<HTMLTextAreaElement>) {
 
 export default function SurveyPage() {
   const [orgType, setOrgType] = useState("");
+  const [orgTypeEtc, setOrgTypeEtc] = useState("");
   const [region, setRegion] = useState("");
+  const [regionEtc, setRegionEtc] = useState("");
   const [futureFormat, setFutureFormat] = useState("");
 
   const [freeText, setFreeText] = useState<FreeTextAnswers>({
@@ -50,8 +52,16 @@ export default function SurveyPage() {
       setErrorMessage("소속기관 유형을 선택해 주세요.");
       return;
     }
+    if (orgType === "etc" && !orgTypeEtc.trim()) {
+      setErrorMessage("소속기관 유형을 직접 입력해 주세요.");
+      return;
+    }
     if (!region) {
       setErrorMessage("주요 활동지역을 선택해 주세요.");
+      return;
+    }
+    if (region === "etc" && !regionEtc.trim()) {
+      setErrorMessage("주요 활동지역을 직접 입력해 주세요.");
       return;
     }
     if (!futureFormat) {
@@ -66,7 +76,9 @@ export default function SurveyPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orgType,
+          orgTypeEtc,
           region,
+          regionEtc,
           futureFormat,
           ...freeText,
         }),
@@ -143,6 +155,15 @@ export default function SurveyPage() {
                       </option>
                     ))}
                   </select>
+                  {orgType === "etc" && (
+                    <input
+                      type="text"
+                      value={orgTypeEtc}
+                      onChange={(e) => setOrgTypeEtc(e.target.value)}
+                      placeholder="소속기관 유형을 직접 입력해 주세요."
+                      className="mt-2 w-full rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
+                    />
+                  )}
                 </div>
 
                 <div>
@@ -164,6 +185,15 @@ export default function SurveyPage() {
                       </option>
                     ))}
                   </select>
+                  {region === "etc" && (
+                    <input
+                      type="text"
+                      value={regionEtc}
+                      onChange={(e) => setRegionEtc(e.target.value)}
+                      placeholder="활동지역을 직접 입력해 주세요."
+                      className="mt-2 w-full rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
+                    />
+                  )}
                 </div>
               </div>
 

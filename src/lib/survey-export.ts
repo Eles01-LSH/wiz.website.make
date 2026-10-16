@@ -4,6 +4,10 @@ import type { SurveyResponse } from "@/lib/survey";
 import { ORG_TYPE_LABELS, REGION_LABELS, FUTURE_FORMAT_LABELS } from "@/data/survey";
 import { EVENT_EXPORT_LABEL } from "@/data/event";
 
+function withEtc(label: string, isEtc: boolean, etc: string) {
+  return isEtc && etc ? `${label}(${etc})` : label;
+}
+
 function formatDate(iso: string) {
   return new Date(iso).toLocaleString("ko-KR", {
     year: "numeric",
@@ -19,8 +23,8 @@ function formatDate(iso: string) {
 export function buildSurveyWorkbook(responses: SurveyResponse[]): { buffer: Buffer; filename: string } {
   const rows = responses.map((r, i) => ({
     No: i + 1,
-    소속기관유형: ORG_TYPE_LABELS[r.orgType],
-    주요활동지역: REGION_LABELS[r.region],
+    소속기관유형: withEtc(ORG_TYPE_LABELS[r.orgType], r.orgType === "etc", r.orgTypeEtc),
+    주요활동지역: withEtc(REGION_LABELS[r.region], r.region === "etc", r.regionEtc),
     "국가정책/현안 관련 질문·의견": r.policyQuestion,
     "소속기관·지역 우선 추진과제": r.priorityTask,
     향후선호운영방식: FUTURE_FORMAT_LABELS[r.futureFormat],

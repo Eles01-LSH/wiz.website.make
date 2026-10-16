@@ -7,7 +7,9 @@ import type { SurveyOrgType, SurveyRegion, SurveyFutureFormat } from "@/data/sur
 export type SurveyResponse = {
   id: string;
   orgType: SurveyOrgType;
+  orgTypeEtc: string;
   region: SurveyRegion;
+  regionEtc: string;
   policyQuestion: string;
   priorityTask: string;
   futureFormat: SurveyFutureFormat;
@@ -18,7 +20,9 @@ export type SurveyResponse = {
 
 export type SurveyResponseInput = {
   orgType: SurveyOrgType;
+  orgTypeEtc?: string;
   region: SurveyRegion;
+  regionEtc?: string;
   policyQuestion?: string;
   priorityTask?: string;
   futureFormat: SurveyFutureFormat;
@@ -29,7 +33,9 @@ export type SurveyResponseInput = {
 type SurveyResponseRow = {
   id: string;
   org_type: SurveyOrgType;
+  org_type_etc: string;
   region: SurveyRegion;
+  region_etc: string;
   policy_question: string;
   priority_task: string;
   future_format: SurveyFutureFormat;
@@ -39,13 +45,15 @@ type SurveyResponseRow = {
 };
 
 const SELECT_COLUMNS =
-  "id, org_type, region, policy_question, priority_task, future_format, additional_topics, operation_feedback, created_at";
+  "id, org_type, org_type_etc, region, region_etc, policy_question, priority_task, future_format, additional_topics, operation_feedback, created_at";
 
 function toSurveyResponse(row: SurveyResponseRow): SurveyResponse {
   return {
     id: row.id,
     orgType: row.org_type,
+    orgTypeEtc: row.org_type_etc,
     region: row.region,
+    regionEtc: row.region_etc,
     policyQuestion: row.policy_question,
     priorityTask: row.priority_task,
     futureFormat: row.future_format,
@@ -94,7 +102,9 @@ export async function addSurveyResponse(input: SurveyResponseInput): Promise<Sur
   const row = {
     id,
     org_type: input.orgType,
+    org_type_etc: input.orgTypeEtc?.trim() ?? "",
     region: input.region,
+    region_etc: input.regionEtc?.trim() ?? "",
     policy_question: input.policyQuestion?.trim() ?? "",
     priority_task: input.priorityTask?.trim() ?? "",
     future_format: input.futureFormat,
@@ -108,7 +118,9 @@ export async function addSurveyResponse(input: SurveyResponseInput): Promise<Sur
   return {
     id,
     orgType: row.org_type,
+    orgTypeEtc: row.org_type_etc,
     region: row.region,
+    regionEtc: row.region_etc,
     policyQuestion: row.policy_question,
     priorityTask: row.priority_task,
     futureFormat: row.future_format,
