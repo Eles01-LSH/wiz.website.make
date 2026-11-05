@@ -1,15 +1,20 @@
 export const CONTACT_INFO = [
   { label: "TEL", value: "062-383-2838" },
   { label: "EMAIL", value: "wizcni2004@naver.com" },
-  { label: "ADDRESS", value: "전남광주 서구 화개중앙로 2 3층" },
+  { label: "ADDRESS", value: "전남광주통합특별시 북구 첨단연신로 45 A동 6층" },
   { label: "HOURS", value: "평일 09:00 - 18:00" },
 ];
 
-export const NAVER_PLACE_URL = "https://map.naver.com/p/entry/place/876646054";
+// TODO: 새 사무실의 네이버 플레이스 페이지가 등록되면 그 URL(https://map.naver.com/p/entry/place/...)로
+// 교체해 주세요. 아직 등록 전이라, 우선 주소 기반 네이버 지도 검색 링크로 연결합니다.
+export const NAVER_PLACE_URL = `https://map.naver.com/p/search/${encodeURIComponent(
+  CONTACT_INFO.find((i) => i.label === "ADDRESS")!.value
+)}`;
 
-// 네이버 플레이스(위 URL)에 등록된 실제 좌표. Geocoding API로 주소 문자열을 변환하면
-// 어긋난 위치(관공서 등)로 튀는 현상이 있어, 플레이스 데이터 기준 좌표를 직접 고정해서 쓴다.
-export const OFFICE_COORDINATES = { lat: 35.1223342, lng: 126.861011 };
+// TODO: 이전 사무실 좌표라 비워뒀습니다. 새 사무실의 네이버 플레이스 좌표를 알게 되면
+// 여기에 { lat, lng }를 다시 고정해 주세요(이유는 NaverMap.tsx의 coordinates 설명 참고).
+// 비워두면 NaverMap이 주소를 Geocoding API로 변환해 자동으로 위치를 잡습니다.
+export const OFFICE_COORDINATES: { lat: number; lng: number } | undefined = undefined;
 
 export const PROJECT_TYPES = [
   { ko: "영상제작", en: "FILM PRODUCTION" },
