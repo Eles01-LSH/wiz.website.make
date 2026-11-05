@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, type DragEvent, type FormEvent } from "react";
+import { useRef, useState, useSyncExternalStore, type DragEvent, type FormEvent } from "react";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import PageHero from "@/components/PageHero";
@@ -26,6 +26,18 @@ const MAX_TOTAL_ATTACHMENT_BYTES = MAX_TOTAL_ATTACHMENT_SIZE_MB * 1024 * 1024;
 function formatFileSize(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.max(1, Math.round(bytes / 1024))}KB`;
   return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
+}
+
+function subscribeNoop() {
+  return () => {};
+}
+
+function getProjectTypeFromUrl() {
+  return new URLSearchParams(window.location.search).get("projectType") ?? "";
+}
+
+function getProjectTypeServerSnapshot() {
+  return "";
 }
 
 function isAllowedFile(file: File) {
@@ -58,6 +70,14 @@ export default function ContactPage() {
   const [fileError, setFileError] = useState<string | null>(null);
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // STUDIO 페이지 등 다른 페이지에서 "?projectType=STUDIO RENTAL" 형태로 넘어오면
+  // 문의 유형을 미리 선택해 둔다(고객이 같은 정보를 두 번 입력하지 않도록).
+  const initialProjectType = useSyncExternalStore(
+    subscribeNoop,
+    getProjectTypeFromUrl,
+    getProjectTypeServerSnapshot
+  );
 
   function addFiles(list: FileList | null) {
     if (!list || list.length === 0) return;
@@ -221,9 +241,10 @@ export default function ContactPage() {
 
                   <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
                     <select
+                      key={initialProjectType}
                       required
                       name="projectType"
-                      defaultValue=""
+                      defaultValue={initialProjectType}
                       className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
                     >
                       <option value="" disabled>

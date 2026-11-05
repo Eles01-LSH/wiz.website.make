@@ -4,6 +4,7 @@ import Hero from "@/components/sections/Hero";
 import Identity from "@/components/sections/Identity";
 import SelectedProjects from "@/components/sections/SelectedProjects";
 import Services from "@/components/sections/Services";
+import OurCreativeSpace from "@/components/sections/OurCreativeSpace";
 import WhyWiz from "@/components/sections/WhyWiz";
 import ExperienceStats from "@/components/sections/ExperienceStats";
 import SelectedClients from "@/components/sections/SelectedClients";
@@ -18,6 +19,7 @@ export default function Home() {
         <Identity />
         <SelectedProjects />
         <Services />
+        <OurCreativeSpace />
         <WhyWiz />
         <ExperienceStats />
         <SelectedClients />

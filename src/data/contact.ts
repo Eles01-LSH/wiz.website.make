@@ -22,6 +22,7 @@ export const PROJECT_TYPES = [
   { ko: "편집", en: "EDITING" },
   { ko: "라이브 중계", en: "LIVE PRODUCTION" },
   { ko: "공간 미디어", en: "SPACE MEDIA" },
+  { ko: "스튜디오 대관", en: "STUDIO RENTAL" },
   { ko: "기타", en: "OTHER" },
 ];
 

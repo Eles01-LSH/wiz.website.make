@@ -3,10 +3,12 @@
 import { useState } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 
 const NAV_LINKS = [
   { label: "ABOUT", href: "/about" },
   { label: "SERVICES", href: "/services" },
+  { label: "STUDIO", href: "/studio" },
   { label: "VOUCHER", href: "/voucher" },
   { label: "PORTFOLIO", href: "/portfolio" },
   { label: "CONTACT", href: "/contact" },
@@ -14,6 +16,7 @@ const NAV_LINKS = [
 
 export default function Header() {
   const [open, setOpen] = useState(false);
+  const pathname = usePathname();
 
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-paper/95 backdrop-blur">
@@ -30,21 +33,27 @@ export default function Header() {
           <span className="text-xl font-black tracking-tight text-ink">WIZ CNI</span>
         </Link>
 
-        <nav className="hidden items-center justify-between md:mx-auto md:flex md:max-w-md md:flex-1">
-          {NAV_LINKS.map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              className="text-sm font-medium text-ink/80 transition-colors hover:text-accent"
-            >
-              {link.label}
-            </Link>
-          ))}
+        <nav className="hidden items-center justify-center gap-5 md:mx-auto md:flex md:flex-1 lg:gap-7">
+          {NAV_LINKS.map((link) => {
+            const active = pathname === link.href;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                aria-current={active ? "page" : undefined}
+                className={`whitespace-nowrap text-sm font-medium transition-colors hover:text-accent ${
+                  active ? "text-accent" : "text-ink/80"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <Link
           href="/contact"
-          className="hidden items-center rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ink md:inline-flex"
+          className="hidden items-center rounded-md bg-accent px-5 py-2.5 text-sm font-semibold text-paper transition-colors hover:bg-ink lg:inline-flex"
         >
           PROJECT INQUIRY
         </Link>
@@ -72,16 +81,20 @@ export default function Header() {
       {open && (
         <div className="border-t border-line bg-paper px-6 pb-8 pt-4 md:hidden">
           <nav className="flex flex-col gap-5">
-            {NAV_LINKS.map((link) => (
-              <Link
-                key={link.href}
-                href={link.href}
-                onClick={() => setOpen(false)}
-                className="text-sm font-semibold text-ink"
-              >
-                {link.label}
-              </Link>
-            ))}
+            {NAV_LINKS.map((link) => {
+              const active = pathname === link.href;
+              return (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setOpen(false)}
+                  aria-current={active ? "page" : undefined}
+                  className={`text-sm font-semibold ${active ? "text-accent" : "text-ink"}`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
             <Link
               href="/contact"
               onClick={() => setOpen(false)}
