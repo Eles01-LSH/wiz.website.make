@@ -13,15 +13,14 @@ import {
   STUDIO_SPECS,
   STUDIO_SPECS_PENDING_NOTICE,
   STUDIO_GALLERY,
-  STUDIO_PRODUCTION,
-  STUDIO_SERVICES,
-  STUDIO_SERVICES_NOTICE,
+  STUDIO_RULES_INTRO,
+  STUDIO_RULES,
+  STUDIO_RULES_CLOSING,
   STUDIO_RENTAL_GUIDE,
   STUDIO_RENTAL_NOTICE,
   STUDIO_FLOOR_CARE_NOTICE,
   STUDIO_ADDRESS,
   STUDIO_ADDRESS_PENDING_NOTICE,
-  STUDIO_PROJECT_TYPE,
 } from "@/data/studio";
 
 const TITLE = "호리존 스튜디오 | HORIZON STUDIO - WIZ CNI";
@@ -51,7 +50,7 @@ export const metadata: Metadata = {
   },
 };
 
-const INQUIRY_HREF = `/contact?projectType=${encodeURIComponent(STUDIO_PROJECT_TYPE)}`;
+const INQUIRY_HREF = "/contact?category=studio";
 const TEL = CONTACT_INFO.find((i) => i.label === "TEL")?.value ?? "";
 const EMAIL = CONTACT_INFO.find((i) => i.label === "EMAIL")?.value ?? "";
 
@@ -69,10 +68,10 @@ export default function StudioPage() {
             <h1 className="mt-5 text-4xl font-black leading-[1.05] text-white sm:text-5xl md:text-6xl">
               {STUDIO_HERO.title}
             </h1>
-            <p className="mt-5 text-lg font-bold text-white/80 md:text-xl">
+            <p className="mt-5 break-keep text-lg font-bold text-white/80 md:text-xl">
               {STUDIO_HERO.subCopy}
             </p>
-            <div className="mt-6 flex flex-col gap-1 text-sm leading-relaxed text-white/60 md:text-base">
+            <div className="mt-6 flex flex-col gap-1 break-keep text-sm leading-relaxed text-white/60 md:text-base">
               {STUDIO_HERO.description.map((line) => (
                 <p key={line}>{line}</p>
               ))}
@@ -83,14 +82,14 @@ export default function StudioPage() {
                 href="#about-studio"
                 className="inline-flex items-center gap-2 rounded-md border border-white/30 px-6 py-3 text-sm font-semibold text-white transition-colors hover:border-white hover:bg-white/10"
               >
-                EXPLORE THE STUDIO
+                스튜디오 소개
                 <span aria-hidden>↓</span>
               </a>
               <Link
                 href={INQUIRY_HREF}
                 className="inline-flex items-center gap-2 rounded-md bg-accent px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-white hover:text-ink"
               >
-                RENTAL INQUIRY
+                스튜디오 예약
                 <span aria-hidden>→</span>
               </Link>
             </div>
@@ -108,20 +107,20 @@ export default function StudioPage() {
           <div className="mx-auto max-w-7xl">
             <Reveal className="mx-auto max-w-2xl text-center">
               <SectionLabel>ABOUT THE STUDIO</SectionLabel>
-              <h2 className="mt-4 text-2xl font-black text-ink sm:text-3xl md:text-4xl">
+              <h2 className="mt-4 break-keep text-2xl font-black text-ink sm:text-3xl md:text-4xl">
                 촬영의 경계를 허무는 공간.
               </h2>
-              <p className="mt-6 text-sm leading-relaxed text-muted md:text-base">
+              <p className="mt-6 break-keep text-sm leading-relaxed text-muted md:text-base">
                 호리존 스튜디오는 벽과 바닥이 만나는 부분을 곡면으로 연결하여 공간의 경계가
                 자연스럽게 사라지는 효과를 구현한 전문 촬영 공간입니다.
               </p>
-              <p className="mt-4 text-sm leading-relaxed text-muted md:text-base">
+              <p className="mt-4 break-keep text-sm leading-relaxed text-muted md:text-base">
                 불필요한 배경 요소를 최소화하여 피사체에 집중할 수 있으며, 조명과 촬영
                 구도에 따라 다양한 분위기를 연출할 수 있습니다.
               </p>
             </Reveal>
 
-            <div className="mt-14 grid grid-cols-1 gap-10 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="mt-14 grid grid-cols-1 gap-10 sm:grid-cols-3">
               {STUDIO_FEATURES.map((feature, i) => (
                 <Reveal
                   key={feature.title}
@@ -132,7 +131,7 @@ export default function StudioPage() {
                     <feature.icon className="h-7 w-7" />
                   </span>
                   <h3 className="mt-5 text-sm font-black text-ink">{feature.title}</h3>
-                  <p className="mt-2 text-xs leading-relaxed text-muted">{feature.desc}</p>
+                  <p className="mt-2 break-keep text-xs leading-relaxed text-muted">{feature.desc}</p>
                 </Reveal>
               ))}
             </div>
@@ -144,7 +143,7 @@ export default function StudioPage() {
           <div className="mx-auto max-w-7xl">
             <Reveal>
               <SectionLabel tone="muted">SPACE &amp; FACILITIES</SectionLabel>
-              <h2 className="mt-4 text-2xl font-black text-ink sm:text-3xl md:text-4xl">
+              <h2 className="mt-4 break-keep text-2xl font-black text-ink sm:text-3xl md:text-4xl">
                 공간 및 시설 정보
               </h2>
             </Reveal>
@@ -154,15 +153,15 @@ export default function StudioPage() {
                 <div className="grid grid-cols-1 gap-x-8 gap-y-6 sm:grid-cols-2 lg:grid-cols-4">
                   {visibleSpecs.map((spec) => (
                     <div key={spec.label}>
-                      <p className="text-[10px] font-bold tracking-[0.2em] text-muted">
+                      <p className="break-keep text-[10px] font-bold tracking-[0.2em] text-muted">
                         {spec.label.toUpperCase()}
                       </p>
-                      <p className="mt-1.5 text-sm font-semibold text-ink">{spec.value}</p>
+                      <p className="mt-1.5 break-keep text-sm font-semibold text-ink">{spec.value}</p>
                     </div>
                   ))}
                 </div>
               ) : (
-                <p className="text-center text-sm text-muted">{STUDIO_SPECS_PENDING_NOTICE}</p>
+                <p className="break-keep text-center text-sm text-muted">{STUDIO_SPECS_PENDING_NOTICE}</p>
               )}
             </Reveal>
 
@@ -172,57 +171,31 @@ export default function StudioPage() {
           </div>
         </section>
 
-        {/* SECTION 04 — PRODUCTION */}
-        <section className="border-b border-line px-6 py-16 md:px-10 md:py-20">
-          <div className="mx-auto max-w-7xl">
-            <Reveal className="text-center">
-              <SectionLabel>WHAT YOU CAN CREATE</SectionLabel>
-              <h2 className="mt-4 text-2xl font-black text-ink sm:text-3xl md:text-4xl">
-                하나의 공간, 다양한 콘텐츠.
-              </h2>
-            </Reveal>
-
-            <div className="mt-14 grid grid-cols-1 gap-x-6 gap-y-10 sm:grid-cols-2">
-              {STUDIO_PRODUCTION.map((item, i) => (
-                <Reveal key={item.index} delay={i * 100}>
-                  <div className="relative aspect-[3/2] w-full overflow-hidden rounded-md bg-mist">
-                    <StudioPlaceholder src={item.image} alt={item.title} />
-                  </div>
-                  <span className="mt-4 block text-xs font-black text-accent">{item.index}</span>
-                  <h3 className="mt-1 text-lg font-black text-ink">{item.title}</h3>
-                  <p className="mt-1 text-sm text-muted">{item.desc}</p>
-                </Reveal>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* SECTION 05 — RENTAL & PRODUCTION SERVICE */}
+        {/* SECTION 04 — STUDIO RULES */}
         <section className="border-b border-line bg-mist px-6 py-16 md:px-10 md:py-20">
           <div className="mx-auto max-w-7xl">
             <Reveal>
-              <SectionLabel tone="muted">RENTAL &amp; PRODUCTION</SectionLabel>
-              <h2 className="mt-4 text-2xl font-black text-ink sm:text-3xl md:text-4xl">
-                이용 방식 안내
+              <SectionLabel tone="muted">STUDIO RULES</SectionLabel>
+              <h2 className="mt-4 break-keep text-2xl font-black text-ink sm:text-3xl md:text-4xl">
+                이용 수칙
               </h2>
+              <p className="mt-4 max-w-2xl break-keep text-sm leading-relaxed text-muted md:text-base">
+                {STUDIO_RULES_INTRO}
+              </p>
             </Reveal>
 
             <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2">
-              {STUDIO_SERVICES.map((service, i) => (
+              {STUDIO_RULES.map((rule, i) => (
                 <Reveal
-                  key={service.index}
-                  delay={i * 100}
+                  key={rule.index}
+                  delay={i * 60}
                   className="rounded-md border border-line bg-paper p-6 md:p-8"
                 >
-                  <span className="text-2xl font-black text-accent">{service.index}.</span>
-                  <h3 className="mt-2 text-xl font-black text-ink">{service.title}</h3>
-                  <p className="mt-1 text-sm font-bold tracking-wide text-accent">
-                    {service.englishTitle}
-                  </p>
-                  <p className="mt-4 text-sm leading-relaxed text-muted">{service.desc}</p>
-                  <ul className="mt-6 flex flex-col gap-3 border-t border-line pt-6">
-                    {service.items.map((item) => (
-                      <li key={item} className="flex gap-3 text-sm leading-relaxed text-muted">
+                  <span className="text-2xl font-black text-accent">{rule.index}.</span>
+                  <h3 className="mt-2 break-keep text-lg font-black text-ink">{rule.title}</h3>
+                  <ul className="mt-5 flex flex-col gap-3 border-t border-line pt-5">
+                    {rule.items.map((item) => (
+                      <li key={item} className="flex gap-3 break-keep text-sm leading-relaxed text-muted">
                         <span className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-accent" />
                         {item}
                       </li>
@@ -232,19 +205,21 @@ export default function StudioPage() {
               ))}
             </div>
 
-            <p className="mt-8 text-center text-xs text-muted">{STUDIO_SERVICES_NOTICE}</p>
+            <p className="mt-8 break-keep text-center text-xs font-semibold text-ink">
+              {STUDIO_RULES_CLOSING}
+            </p>
           </div>
         </section>
 
-        {/* SECTION 06 — RENTAL GUIDE */}
+        {/* SECTION 05 — RENTAL GUIDE */}
         <section className="border-b border-line px-6 py-16 md:px-10 md:py-20">
           <div className="mx-auto max-w-7xl">
             <Reveal>
               <SectionLabel>RENTAL GUIDE</SectionLabel>
-              <h2 className="mt-4 text-2xl font-black text-ink sm:text-3xl md:text-4xl">
+              <h2 className="mt-4 break-keep text-2xl font-black text-ink sm:text-3xl md:text-4xl">
                 대관 안내
               </h2>
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-muted md:text-base">
+              <p className="mt-4 max-w-2xl break-keep text-sm leading-relaxed text-muted md:text-base">
                 {STUDIO_RENTAL_NOTICE}
               </p>
             </Reveal>
@@ -252,26 +227,26 @@ export default function StudioPage() {
             <Reveal delay={80} className="mt-10 grid grid-cols-1 gap-x-8 gap-y-6 rounded-md border border-line bg-mist p-6 sm:grid-cols-2 md:p-8 lg:grid-cols-4">
               {STUDIO_RENTAL_GUIDE.map((item) => (
                 <div key={item.label}>
-                  <p className="text-[10px] font-bold tracking-[0.2em] text-muted">
+                  <p className="break-keep text-[10px] font-bold tracking-[0.2em] text-muted">
                     {item.label.toUpperCase()}
                   </p>
-                  <p className="mt-1.5 text-sm font-semibold text-ink">{item.value}</p>
+                  <p className="mt-1.5 break-keep text-sm font-semibold text-ink">{item.value}</p>
                 </div>
               ))}
             </Reveal>
 
             <Reveal delay={120} className="mt-6 rounded-md border border-line px-6 py-5">
-              <p className="text-xs leading-relaxed text-muted">{STUDIO_FLOOR_CARE_NOTICE}</p>
+              <p className="break-keep text-xs leading-relaxed text-muted">{STUDIO_FLOOR_CARE_NOTICE}</p>
             </Reveal>
           </div>
         </section>
 
-        {/* SECTION 07 — LOCATION & CONTACT */}
+        {/* SECTION 06 — LOCATION & CONTACT */}
         <section className="px-6 py-16 md:px-10 md:py-20">
           <div className="mx-auto max-w-7xl">
             <Reveal className="text-center">
               <SectionLabel>VISIT OUR STUDIO</SectionLabel>
-              <h2 className="mt-4 text-2xl font-black text-ink sm:text-3xl md:text-4xl">
+              <h2 className="mt-4 break-keep text-2xl font-black text-ink sm:text-3xl md:text-4xl">
                 예약 및 대관 문의
               </h2>
             </Reveal>
@@ -282,7 +257,7 @@ export default function StudioPage() {
             >
               <div>
                 <p className="text-xs font-semibold tracking-[0.3em] text-muted">ADDRESS</p>
-                <p className="mt-2 text-sm font-medium text-ink">
+                <p className="mt-2 break-keep text-sm font-medium text-ink">
                   {STUDIO_ADDRESS ?? STUDIO_ADDRESS_PENDING_NOTICE}
                 </p>
               </div>
@@ -301,7 +276,7 @@ export default function StudioPage() {
                 href={INQUIRY_HREF}
                 className="inline-flex items-center gap-2 rounded-md bg-accent px-7 py-3.5 text-sm font-semibold text-white transition-colors hover:bg-ink"
               >
-                RENTAL INQUIRY
+                스튜디오 예약
                 <span aria-hidden>→</span>
               </Link>
             </Reveal>

@@ -28,16 +28,20 @@ function formatFileSize(bytes: number) {
   return `${(bytes / (1024 * 1024)).toFixed(1)}MB`;
 }
 
+type ContactCategory = "production" | "studio";
+
 function subscribeNoop() {
   return () => {};
 }
 
-function getProjectTypeFromUrl() {
-  return new URLSearchParams(window.location.search).get("projectType") ?? "";
+function getCategoryFromUrl(): ContactCategory {
+  return new URLSearchParams(window.location.search).get("category") === "studio"
+    ? "studio"
+    : "production";
 }
 
-function getProjectTypeServerSnapshot() {
-  return "";
+function getCategoryServerSnapshot(): ContactCategory {
+  return "production";
 }
 
 function isAllowedFile(file: File) {
@@ -71,13 +75,14 @@ export default function ContactPage() {
   const [dragActive, setDragActive] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  // STUDIO 페이지 등 다른 페이지에서 "?projectType=STUDIO RENTAL" 형태로 넘어오면
-  // 문의 유형을 미리 선택해 둔다(고객이 같은 정보를 두 번 입력하지 않도록).
-  const initialProjectType = useSyncExternalStore(
+  // STUDIO 페이지 등에서 "?category=studio"로 넘어오면 스튜디오 예약 탭이 미리 선택되어 있다.
+  const urlCategory = useSyncExternalStore(
     subscribeNoop,
-    getProjectTypeFromUrl,
-    getProjectTypeServerSnapshot
+    getCategoryFromUrl,
+    getCategoryServerSnapshot
   );
+  const [categoryOverride, setCategoryOverride] = useState<ContactCategory | null>(null);
+  const category = categoryOverride ?? urlCategory;
 
   function addFiles(list: FileList | null) {
     if (!list || list.length === 0) return;
@@ -141,6 +146,7 @@ export default function ContactPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          category,
           company: form.get("company"),
           contactName: form.get("contactName"),
           phone: form.get("phone"),
@@ -148,6 +154,9 @@ export default function ContactPage() {
           projectType: form.get("projectType"),
           budget: form.get("budget"),
           timeline: form.get("timeline"),
+          desiredDate: form.get("desiredDate"),
+          desiredTime: form.get("desiredTime"),
+          purpose: form.get("purpose"),
           message: form.get("message"),
           attachments,
         }),
@@ -167,9 +176,13 @@ export default function ContactPage() {
       <Header />
       <main>
         <PageHero
-          label="PROJECT INQUIRY"
-          title="제작 문의"
-          description="프로젝트의 목적과 방향을 알려주시면, WIZ CNI가 가장 적합한 제작 방식을 제안합니다."
+          label={category === "studio" ? "STUDIO RESERVATION" : "PROJECT INQUIRY"}
+          title={category === "studio" ? "스튜디오 예약 문의" : "제작 문의"}
+          description={
+            category === "studio"
+              ? "호리존 스튜디오 대관을 원하신다면 희망 일정과 목적을 남겨주세요. 확인 후 담당자가 안내드립니다."
+              : "프로젝트의 목적과 방향을 알려주시면, WIZ CNI가 가장 적합한 제작 방식을 제안합니다."
+          }
         />
 
         <section className="px-6 pt-16 pb-10 md:px-10 md:pt-20 md:pb-12">
@@ -204,20 +217,49 @@ export default function ContactPage() {
                   </p>
                 </div>
               ) : (
-                <form onSubmit={handleSubmit} className="flex flex-col gap-5">
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                    <input
-                      required
-                      type="text"
-                      name="company"
-                      placeholder="회사/기관명"
-                      className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
-                    />
+                <>
+                  <div className="mb-6 inline-flex w-fit rounded-md border border-line bg-mist p-1">
+                    {(
+                      [
+                        { value: "production", label: "영상제작 문의" },
+                        { value: "studio", label: "스튜디오 예약" },
+                      ] as const
+                    ).map((tab) => (
+                      <button
+                        key={tab.value}
+                        type="button"
+                        onClick={() => setCategoryOverride(tab.value)}
+                        className={`rounded-md px-4 py-2 text-sm font-semibold transition-colors ${
+                          category === tab.value
+                            ? "bg-paper text-ink shadow-sm"
+                            : "text-muted hover:text-ink"
+                        }`}
+                      >
+                        {tab.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  <form key={category} onSubmit={handleSubmit} className="flex flex-col gap-5">
+                  <div
+                    className={`grid grid-cols-1 gap-5 ${
+                      category === "production" ? "sm:grid-cols-2" : ""
+                    }`}
+                  >
+                    {category === "production" && (
+                      <input
+                        required
+                        type="text"
+                        name="company"
+                        placeholder="회사/기관명"
+                        className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
+                      />
+                    )}
                     <input
                       required
                       type="text"
                       name="contactName"
-                      placeholder="담당자명"
+                      placeholder={category === "studio" ? "예약자명" : "담당자명"}
                       className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
                     />
                   </div>
@@ -239,116 +281,148 @@ export default function ContactPage() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
-                    <select
-                      key={initialProjectType}
-                      required
-                      name="projectType"
-                      defaultValue={initialProjectType}
-                      className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
-                    >
-                      <option value="" disabled>
-                        프로젝트 종류
-                      </option>
-                      {PROJECT_TYPES.map((type) => (
-                        <option key={type.en} value={type.en}>
-                          {type.ko} / {type.en}
-                        </option>
-                      ))}
-                    </select>
+                  {category === "production" ? (
+                    <>
+                      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                        <select
+                          required
+                          name="projectType"
+                          defaultValue=""
+                          className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
+                        >
+                          <option value="" disabled>
+                            프로젝트 종류
+                          </option>
+                          {PROJECT_TYPES.map((type) => (
+                            <option key={type.en} value={type.en}>
+                              {type.ko} / {type.en}
+                            </option>
+                          ))}
+                        </select>
 
-                    <select
-                      name="budget"
-                      defaultValue=""
-                      className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
-                    >
-                      <option value="" disabled>
-                        예상 예산 (선택)
-                      </option>
-                      {BUDGET_RANGES.map((range) => (
-                        <option key={range} value={range}>
-                          {range}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
+                        <select
+                          name="budget"
+                          defaultValue=""
+                          className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
+                        >
+                          <option value="" disabled>
+                            예상 예산 (선택)
+                          </option>
+                          {BUDGET_RANGES.map((range) => (
+                            <option key={range} value={range}>
+                              {range}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
 
-                  <input
-                    type="text"
-                    name="timeline"
-                    placeholder="희망 제작 일정 (선택, 예: 2026년 3월 초 촬영 희망)"
-                    className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
-                  />
-
-                  <textarea
-                    required
-                    name="message"
-                    rows={6}
-                    placeholder="프로젝트의 목적과 방향, 참고할 만한 레퍼런스가 있다면 자유롭게 남겨주세요."
-                    className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
-                  />
-
-                  <div>
-                    <div
-                      onDragOver={(e) => {
-                        e.preventDefault();
-                        setDragActive(true);
-                      }}
-                      onDragLeave={() => setDragActive(false)}
-                      onDrop={handleDrop}
-                      onClick={() => fileInputRef.current?.click()}
-                      className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed px-4 py-6 text-center transition-colors ${
-                        dragActive
-                          ? "border-accent bg-accent/5"
-                          : "border-line hover:border-accent"
-                      }`}
-                    >
-                      <PaperclipIcon className="h-5 w-5 text-muted" />
-                      <p className="text-sm font-medium text-ink">
-                        참고 자료 첨부{" "}
-                        <span className="text-muted">(선택, 클릭 또는 드래그하여 업로드)</span>
-                      </p>
-                      <p className="text-xs text-muted">
-                        PDF, PPT, DOC, JPG, PNG, ZIP · 파일당 최대 {MAX_ATTACHMENT_SIZE_MB}MB
-                      </p>
                       <input
-                        ref={fileInputRef}
-                        type="file"
-                        multiple
-                        accept={ALLOWED_ATTACHMENT_EXTENSIONS.join(",")}
-                        onChange={(e) => addFiles(e.target.files)}
-                        className="hidden"
+                        type="text"
+                        name="timeline"
+                        placeholder="희망 제작 일정 (선택, 예: 2026년 3월 초 촬영 희망)"
+                        className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
                       />
-                    </div>
+                    </>
+                  ) : (
+                    <>
+                      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+                        <input
+                          required
+                          type="date"
+                          name="desiredDate"
+                          aria-label="희망 대관 일자"
+                          className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
+                        />
+                        <input
+                          type="text"
+                          name="desiredTime"
+                          placeholder="희망 시간대 (예: 오전 9시 ~ 12시)"
+                          className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
+                        />
+                      </div>
 
-                    {fileError && (
-                      <p className="mt-2 text-xs font-medium text-red-500">{fileError}</p>
-                    )}
+                      <input
+                        type="text"
+                        name="purpose"
+                        placeholder="대관 목적 (예: 제품 촬영, 인터뷰 촬영 등)"
+                        className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
+                      />
+                    </>
+                  )}
 
-                    {files.length > 0 && (
-                      <ul className="mt-3 flex flex-col gap-2">
-                        {files.map((file, i) => (
-                          <li
-                            key={`${file.name}-${i}`}
-                            className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-xs"
-                          >
-                            <span className="truncate text-ink">{file.name}</span>
-                            <span className="flex shrink-0 items-center gap-3 text-muted">
-                              {formatFileSize(file.size)}
-                              <button
-                                type="button"
-                                onClick={() => removeFile(i)}
-                                aria-label={`${file.name} 제거`}
-                                className="text-muted transition-colors hover:text-accent"
+                  {category === "production" && (
+                    <>
+                      <textarea
+                        required
+                        name="message"
+                        rows={6}
+                        placeholder="프로젝트의 목적과 방향, 참고할 만한 레퍼런스가 있다면 자유롭게 남겨주세요."
+                        className="rounded-md border border-line bg-transparent px-4 py-3 text-sm text-ink outline-none transition-colors focus:border-accent"
+                      />
+
+                      <div>
+                        <div
+                          onDragOver={(e) => {
+                            e.preventDefault();
+                            setDragActive(true);
+                          }}
+                          onDragLeave={() => setDragActive(false)}
+                          onDrop={handleDrop}
+                          onClick={() => fileInputRef.current?.click()}
+                          className={`flex cursor-pointer flex-col items-center justify-center gap-2 rounded-md border border-dashed px-4 py-6 text-center transition-colors ${
+                            dragActive
+                              ? "border-accent bg-accent/5"
+                              : "border-line hover:border-accent"
+                          }`}
+                        >
+                          <PaperclipIcon className="h-5 w-5 text-muted" />
+                          <p className="text-sm font-medium text-ink">
+                            참고 자료 첨부{" "}
+                            <span className="text-muted">(선택, 클릭 또는 드래그하여 업로드)</span>
+                          </p>
+                          <p className="text-xs text-muted">
+                            PDF, PPT, DOC, JPG, PNG, ZIP · 파일당 최대 {MAX_ATTACHMENT_SIZE_MB}MB
+                          </p>
+                          <input
+                            ref={fileInputRef}
+                            type="file"
+                            multiple
+                            accept={ALLOWED_ATTACHMENT_EXTENSIONS.join(",")}
+                            onChange={(e) => addFiles(e.target.files)}
+                            className="hidden"
+                          />
+                        </div>
+
+                        {fileError && (
+                          <p className="mt-2 text-xs font-medium text-red-500">{fileError}</p>
+                        )}
+
+                        {files.length > 0 && (
+                          <ul className="mt-3 flex flex-col gap-2">
+                            {files.map((file, i) => (
+                              <li
+                                key={`${file.name}-${i}`}
+                                className="flex items-center justify-between gap-3 rounded-md border border-line px-3 py-2 text-xs"
                               >
-                                <XIcon />
-                              </button>
-                            </span>
-                          </li>
-                        ))}
-                      </ul>
-                    )}
-                  </div>
+                                <span className="truncate text-ink">{file.name}</span>
+                                <span className="flex shrink-0 items-center gap-3 text-muted">
+                                  {formatFileSize(file.size)}
+                                  <button
+                                    type="button"
+                                    onClick={() => removeFile(i)}
+                                    aria-label={`${file.name} 제거`}
+                                    className="text-muted transition-colors hover:text-accent"
+                                  >
+                                    <XIcon />
+                                  </button>
+                                </span>
+                              </li>
+                            ))}
+                          </ul>
+                        )}
+                      </div>
+                    </>
+                  )}
 
                   <div className="flex flex-col items-end gap-2">
                     {submitError && (
@@ -363,7 +437,9 @@ export default function ContactPage() {
                         ? "첨부파일 업로드 중..."
                         : sending
                           ? "전송 중..."
-                          : "프로젝트 상담 시작하기"}
+                          : category === "studio"
+                            ? "예약 문의 보내기"
+                            : "프로젝트 상담 시작하기"}
                       {!sending && <span aria-hidden>→</span>}
                     </button>
                     <p className="text-xs text-muted">
@@ -371,6 +447,7 @@ export default function ContactPage() {
                     </p>
                   </div>
                 </form>
+                </>
               )}
             </div>
           </div>

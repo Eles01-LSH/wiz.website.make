@@ -21,16 +21,15 @@ export default function Header() {
   return (
     <header className="sticky top-0 z-50 border-b border-line bg-paper/95 backdrop-blur">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-6 md:h-20 md:px-10">
-        <Link href="/" className="flex items-center gap-2.5">
+        <Link href="/" className="flex items-center">
           <Image
-            src="/wiz-icon.png"
-            alt="WIZ CNI"
-            width={135}
-            height={59}
+            src="/wiz-logo.png"
+            alt="WIZ C&I"
+            width={1983}
+            height={793}
             priority
-            className="h-7 w-auto md:h-8"
+            className="h-14 w-auto md:h-16"
           />
-          <span className="text-xl font-black tracking-tight text-ink">WIZ CNI</span>
         </Link>
 
         <nav className="hidden items-center justify-center gap-5 md:mx-auto md:flex md:flex-1 lg:gap-7">

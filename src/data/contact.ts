@@ -11,10 +11,13 @@ export const NAVER_PLACE_URL = `https://map.naver.com/p/search/${encodeURICompon
   CONTACT_INFO.find((i) => i.label === "ADDRESS")!.value
 )}`;
 
-// TODO: 이전 사무실 좌표라 비워뒀습니다. 새 사무실의 네이버 플레이스 좌표를 알게 되면
-// 여기에 { lat, lng }를 다시 고정해 주세요(이유는 NaverMap.tsx의 coordinates 설명 참고).
-// 비워두면 NaverMap이 주소를 Geocoding API로 변환해 자동으로 위치를 잡습니다.
-export const OFFICE_COORDINATES: { lat: number; lng: number } | undefined = undefined;
+// 새 사무실 좌표(35° 12' 5.60" N, 126° 51' 48.50" E를 10진수로 변환).
+// Geocoding API가 이 주소를 관공서 좌표로 잘못 변환하는 문제가 있어 고정값을 사용한다
+// (이유는 NaverMap.tsx의 coordinates 설명 참고).
+export const OFFICE_COORDINATES: { lat: number; lng: number } | undefined = {
+  lat: 35.201556,
+  lng: 126.863472,
+};
 
 export const PROJECT_TYPES = [
   { ko: "영상제작", en: "FILM PRODUCTION" },

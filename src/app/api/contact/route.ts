@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { sendContactEmail, type ContactAttachment } from "@/lib/email";
 
 type ContactRequestBody = {
+  category?: unknown;
   company?: unknown;
   contactName?: unknown;
   phone?: unknown;
@@ -9,6 +10,9 @@ type ContactRequestBody = {
   projectType?: unknown;
   budget?: unknown;
   timeline?: unknown;
+  desiredDate?: unknown;
+  desiredTime?: unknown;
+  purpose?: unknown;
   message?: unknown;
   attachments?: unknown;
 };
@@ -34,10 +38,18 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "요청 형식이 올바르지 않습니다." }, { status: 400 });
   }
 
+  const category = asString(body.category) === "studio" ? "studio" : "production";
   const phone = asString(body.phone);
   const message = asString(body.message);
+  const desiredDate = asString(body.desiredDate);
 
-  if (!phone || !message) {
+  if (!phone) {
+    return NextResponse.json({ error: "필수 항목이 누락되었습니다." }, { status: 400 });
+  }
+  if (category === "production" && !message) {
+    return NextResponse.json({ error: "필수 항목이 누락되었습니다." }, { status: 400 });
+  }
+  if (category === "studio" && !desiredDate) {
     return NextResponse.json({ error: "필수 항목이 누락되었습니다." }, { status: 400 });
   }
 
@@ -47,6 +59,7 @@ export async function POST(request: Request) {
 
   try {
     await sendContactEmail({
+      category,
       company: asString(body.company) || undefined,
       contactName: asString(body.contactName) || undefined,
       phone,
@@ -54,7 +67,10 @@ export async function POST(request: Request) {
       projectType: asString(body.projectType) || undefined,
       budget: asString(body.budget) || undefined,
       timeline: asString(body.timeline) || undefined,
-      message,
+      desiredDate: desiredDate || undefined,
+      desiredTime: asString(body.desiredTime) || undefined,
+      purpose: asString(body.purpose) || undefined,
+      message: message || undefined,
       attachments,
     });
   } catch (err) {

@@ -36,6 +36,7 @@ async function createAttachmentLinks(attachments: ContactAttachment[]) {
 }
 
 export type ContactPayload = {
+  category?: "production" | "studio";
   company?: string;
   contactName?: string;
   phone: string;
@@ -43,7 +44,10 @@ export type ContactPayload = {
   projectType?: string;
   budget?: string;
   timeline?: string;
-  message: string;
+  desiredDate?: string;
+  desiredTime?: string;
+  purpose?: string;
+  message?: string;
   attachments?: ContactAttachment[];
 };
 
@@ -83,15 +87,27 @@ export async function sendContactEmail(payload: ContactPayload) {
   const transporter = getTransporter();
   const senderAddress = `${toNaverLoginId(NAVER_MAIL_USER!)}@naver.com`;
 
-  const rows: [string, string | undefined][] = [
-    ["회사/기관명", payload.company],
-    ["담당자명", payload.contactName],
-    ["연락처", payload.phone],
-    ["이메일", payload.email],
-    ["프로젝트 종류", payload.projectType],
-    ["예상 예산", payload.budget],
-    ["희망 제작 일정", payload.timeline],
-  ];
+  const isStudio = payload.category === "studio";
+
+  const rows: [string, string | undefined][] = isStudio
+    ? [
+        ["회사/기관명", payload.company],
+        ["예약자명", payload.contactName],
+        ["연락처", payload.phone],
+        ["이메일", payload.email],
+        ["희망 대관 일자", payload.desiredDate],
+        ["희망 시간대", payload.desiredTime],
+        ["대관 목적", payload.purpose],
+      ]
+    : [
+        ["회사/기관명", payload.company],
+        ["담당자명", payload.contactName],
+        ["연락처", payload.phone],
+        ["이메일", payload.email],
+        ["프로젝트 종류", payload.projectType],
+        ["예상 예산", payload.budget],
+        ["희망 제작 일정", payload.timeline],
+      ];
 
   const rowsHtml = rows
     .filter(([, value]) => value)
@@ -118,20 +134,30 @@ export async function sendContactEmail(payload: ContactPayload) {
     `
     : "";
 
+  const messageHtml = payload.message
+    ? `<p style="margin-top:16px;white-space:pre-wrap;line-height:1.6;">${escapeHtml(payload.message)}</p>`
+    : "";
+
   const html = `
-    <div style="font-family:sans-serif;font-size:14px;color:#0b0b0c;">
-      <h2 style="margin:0 0 16px;">새로운 제작 문의가 도착했습니다</h2>
-      <table style="border-collapse:collapse;">${rowsHtml}</table>
-      <p style="margin-top:16px;white-space:pre-wrap;line-height:1.6;">${escapeHtml(payload.message)}</p>
-      ${attachmentsHtml}
-    </div>
+    <!doctype html>
+    <html>
+      <head><meta charset="utf-8" /></head>
+      <body style="font-family:sans-serif;font-size:14px;color:#0b0b0c;">
+        <h2 style="margin:0 0 16px;">${
+          isStudio ? "새로운 스튜디오 예약 문의가 도착했습니다" : "새로운 제작 문의가 도착했습니다"
+        }</h2>
+        <table style="border-collapse:collapse;">${rowsHtml}</table>
+        ${messageHtml}
+        ${attachmentsHtml}
+      </body>
+    </html>
   `;
 
   await transporter.sendMail({
     from: `WIZ CNI 웹사이트 <${senderAddress}>`,
     to: TO_EMAIL,
     replyTo: payload.email || undefined,
-    subject: `[WIZ CNI 문의] ${payload.company || payload.contactName || "새 문의"}`,
+    subject: `[WIZ CNI ${isStudio ? "스튜디오 예약" : "문의"}] ${payload.company || payload.contactName || "새 문의"}`,
     html,
   });
 }
